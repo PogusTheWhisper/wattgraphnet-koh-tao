@@ -1,0 +1,42 @@
+# WattGraphNet Requirements
+# 
+# Installation Instructions:
+# 1. conda install conda-forge::pytorch
+# 2. pip install torch_geometric
+# 3. pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.7.0+cu128.html
+# 4. pip install -r requirements.txt
+
+# Core dependencies
+pandas>=1.5.0
+numpy>=1.21.0
+scikit-learn>=1.1.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+plotly>=5.0.0
+folium>=0.12.0
+
+# Data processing
+openpyxl>=3.0.0
+xlrd>=2.0.0
+dask>=2022.0.0
+
+# Machine Learning
+autogluon>=1.0.0
+onnxruntime>=1.12.0
+
+# Jupyter and development
+jupyter>=1.0.0
+notebook>=6.4.0
+ipywidgets>=7.6.0
+
+# Utilities
+tqdm>=4.64.0
+pathlib2>=2.3.0
+python-dateutil>=2.8.0
+
+# Optional: For advanced features
+# networkx>=2.8.0  # For graph operations
+# torch-geometric>=2.3.0  # Already installed via conda/pip
+# pyg-lib  # Already installed via pip

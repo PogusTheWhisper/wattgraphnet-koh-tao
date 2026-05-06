@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Farming Broker • Farmer</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- LINE LIFF v2 -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    /* mobile safe area + sticky bottom nav */
+    .safe { padding-bottom: env(safe-area-inset-bottom); }
+    .card { @apply bg-white rounded-2xl shadow p-4; }
+    .btn  { @apply w-full py-3 rounded-xl font-semibold; }
+    .btn-primary { @apply bg-green-600 text-white active:opacity-90; }
+    .btn-outline { @apply border border-gray-300 bg-white; }
+    .badge      { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="app" class="max-w-sm mx-auto min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur sticky top-0 z-20 border-b">
+      <div class="px-4 py-3 flex items-center gap-3">
+        <img id="userAvatar" class="w-9 h-9 rounded-full hidden" alt="">
+        <div class="flex-1">
+          <div class="text-sm text-gray-500">สวัสดี</div>
+          <div id="userName" class="font-semibold">Farmer</div>
+        </div>
+        <button id="openProfile" class="text-sm text-gray-600 underline">โปรไฟล์</button>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <main class="flex-1 px-4 py-4 space-y-4">
+
+      <!-- Home -->
+      <section id="page-home" class="space-y-4">
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm text-gray-500">สถานะพื้นที่วันนี้</div>
+              <div id="homeStatus" class="mt-1 text-lg font-semibold">—</div>
+              <div id="homeExplain" class="text-xs text-gray-500">แตะ “เช็คความชื้น” เพื่อตรวจ</div>
+            </div>
+            <img src="https://cdn.jsdelivr.net/gh/tabler/tabler-icons/icons/plant.svg" class="w-12 h-12 opacity-70" />
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button class="btn btn-primary" onclick="nav('status');checkStatus()">เช็คความชื้น</button>
+            <button class="btn btn-outline" onclick="nav('register')">ลงทะเบียนแปลง</button>
+          </div>
+          <div class="mt-2 grid grid-cols-2 gap-2">
+            <button class="btn btn-outline" onclick="nav('offer');prefillOffer()">ขอรับข้อเสนอ</button>
+            <button class="btn btn-outline" onclick="nav('deals')">ดีลของฉัน</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="font-semibold mb-2">ประกาศล่าสุด</div>
+          <ul id="homeNews" class="text-sm text-gray-600 list-disc pl-5 space-y-1">
+            <li>ราคาข้าวโพดวันนี้อัปเดตแล้ว</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Register Plot -->
+      <section id="page-register" class="hidden space-y-4">
+        <div class="card">
+          <div class="font-semibold mb-3">ลงทะเบียนแปลง</div>
+          <form id="formRegister" onsubmit="registerParcel(event)">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-gray-500">พืช</label>
+                <select id="crop" class="w-full mt-1 border rounded-lg p-2">
+                  <option>ข้าวโพด</option>
+                  <option>ข้าว</option>
+                  <option>อ้อย</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500">ขนาด (ไร่)</label>
+                <input id="sizeRai" type="number" step="0.1" class="w-full mt-1 border rounded-lg p-2" placeholder="เช่น 5.5" />
+              </div>
+              <div class="col-span-2">
+                <label class="text-xs text-gray-500">พิกัด</label>
+                <div class="mt-1 flex gap-2">
+                  <input id="lat" class="flex-1 border rounded-lg p-2" placeholder="lat" />
+                  <input id="lng" class="flex-1 border rounded-lg p-2" placeholder="lng" />
+                  <button type="button" class="px-3 rounded-lg border" onclick="grabGPS()">📍</button>
+                </div>
+              </div>
+              <div class="col-span-2">
+                <label class="text-xs text-gray-500">รูปแปลง (ไม่บังคับ)</label>
+                <input id="photo" type="file" accept="image/*" class="w-full mt-1" />
+              </div>
+            </div>
+            <button class="btn btn-primary mt-4" type="submit">บันทึก</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Status -->
+      <section id="page-status" class="hidden space-y-4">
+        <div class="card">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold">ความชื้น/ความพร้อมเก็บเกี่ยว</div>
+            <button class="text-sm underline" onclick="checkStatus()">รีเฟรช</button>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span id="statusBadge" class="badge bg-gray-200 text-gray-700">กำลังตรวจ…</span>
+            <span id="statusText" class="text-sm text-gray-600">—</span>
+          </div>
+          <div class="mt-3 grid grid-cols-3 text-center">
+            <div>
+              <div class="text-xs text-gray-500">NDWI</div>
+              <div id="ndwi" class="font-semibold">—</div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">LSWI</div>
+              <div id="lswi" class="font-semibold">—</div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">อัปเดต</div>
+              <div id="updated" class="font-semibold">—</div>
+            </div>
+          </div>
+          <button class="btn btn-outline mt-4" onclick="shareStatus()">ส่งให้ดีลเลอร์ในแชต</button>
+        </div>
+      </section>
+
+      <!-- Request Offer -->
+      <section id="page-offer" class="hidden space-y-4">
+        <div class="card">
+          <div class="font-semibold mb-3">ขอรับข้อเสนอซื้อ</div>
+          <form id="formOffer" onsubmit="createOffer(event)">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs text-gray-500">ปริมาณ (ตัน)</label>
+                <input id="qtyTon" type="number" step="0.1" class="w-full mt-1 border rounded-lg p-2" />
+              </div>
+              <div>
+                <label class="text-xs text-gray-500">ความชื้น (%)</label>
+                <input id="moisture" type="number" step="0.1" class="w-full mt-1 border rounded-lg p-2" />
+              </div>
+              <div class="col-span-2">
+                <label class="text-xs text-gray-500">หมายเหตุ</label>
+                <input id="note" class="w-full mt-1 border rounded-lg p-2" placeholder="เช่น พร้อมตัดสัปดาห์หน้า" />
+              </div>
+            </div>
+            <button class="btn btn-primary mt-4" type="submit">ส่งคำขอ</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Deals -->
+      <section id="page-deals" class="hidden space-y-3">
+        <div class="card">
+          <div class="font-semibold mb-2">ดีลของฉัน</div>
+          <div id="dealList" class="space-y-2 text-sm text-gray-700">ยังไม่มีดีล</div>
+        </div>
+      </section>
+
+      <!-- Profile Sheet (simple) -->
+      <section id="page-profile" class="hidden space-y-4">
+        <div class="card">
+          <div class="font-semibold mb-2">โปรไฟล์</div>
+          <div id="profileBox" class="text-sm text-gray-700">—</div>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button class="btn btn-outline" onclick="liff.logout(); location.reload()">ออกจากระบบ</button>
+            <button class="btn btn-outline" onclick="nav('home')">กลับหน้าหลัก</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="safe sticky bottom-0 z-20 bg-white border-t">
+      <div class="max-w-sm mx-auto grid grid-cols-4 text-center">
+        <button class="py-3 text-sm" onclick="nav('home')">หน้าแรก</button>
+        <button class="py-3 text-sm" onclick="nav('register')">ลงทะเบียน</button>
+        <button class="py-3 text-sm" onclick="nav('status')">สถานะ</button>
+        <button class="py-3 text-sm" onclick="nav('deals');loadDeals()">ดีล</button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // ====== CONFIG ======
+    const LIFF_ID  = "PUT_YOUR_LIFF_ID_HERE";
+    const API_BASE = "https://your-api.example.com"; // <- change to your backend
+
+    // ====== STATE ======
+    const state = { userId: null, idToken: null, parcels: [], currentParcelId: null };
+
+    // ====== NAV ======
+    function nav(page) {
+      for (const el of document.querySelectorAll('main > section')) el.classList.add('hidden');
+      document.getElementById(`page-${page}`).classList.remove('hidden');
+      if (page === 'profile') loadProfile();
+    }
+
+    // ====== HELPERS ======
+    async function fetchJSON(path, opts={}) {
+      const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers||{});
+      if (state.idToken) headers["Authorization"] = "Bearer " + state.idToken;
+      const res = await fetch(API_BASE + path, Object.assign({}, opts, { headers }));
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    }
+    function setBadge(el, label, tone) {
+      el.className = "badge " + ({
+        good:  "bg-green-100 text-green-700",
+        warn:  "bg-yellow-100 text-yellow-700",
+        bad:   "bg-red-100 text-red-700",
+        info:  "bg-gray-200 text-gray-700"
+      }[tone] || "bg-gray-200 text-gray-700");
+      el.textContent = label;
+    }
+
+    // ====== INIT LIFF ======
+    (async () => {
+      await liff.init({ liffId: LIFF_ID });
+      if (!liff.isLoggedIn()) { liff.login(); return; }
+      state.idToken = liff.getIDToken();
+      const prof = await liff.getProfile();
+      state.userId = prof.userId;
+      document.getElementById('userName').textContent = prof.displayName || 'Farmer';
+      const ava = document.getElementById('userAvatar');
+      if (prof.pictureUrl) { ava.src = prof.pictureUrl; ava.classList.remove('hidden'); }
+      // preload parcels
+      try {
+        const me = await fetchJSON(`/farmers/me`);
+        state.parcels = me.parcels || [];
+        state.currentParcelId = state.parcels[0]?.id || null;
+      } catch (e) {}
+      nav('home');
+    })();
+
+    // ====== PROFILE ======
+    async function loadProfile() {
+      const prof = await liff.getProfile();
+      document.getElementById('profileBox').innerHTML = `
+        <div>ชื่อ: <b>${prof.displayName}</b></div>
+        <div class="text-xs text-gray-500 break-all">userId: ${state.userId || "-"}</div>
+      `;
+    }
+    document.getElementById('openProfile').onclick = () => nav('profile');
+
+    // ====== GPS ======
+    function grabGPS() {
+      if (!navigator.geolocation) return alert('อุปกรณ์ไม่รองรับ GPS');
+      navigator.geolocation.getCurrentPosition(pos => {
+        lat.value = pos.coords.latitude.toFixed(6);
+        lng.value = pos.coords.longitude.toFixed(6);
+      }, (err) => alert('ไม่สามารถดึงพิกัด: ' + err.message), { enableHighAccuracy:true, timeout:8000 });
+    }
+
+    // ====== REGISTER PARCEL ======
+    async function registerParcel(ev){
+      ev.preventDefault();
+      const body = {
+        crop: crop.value,
+        size_rai: parseFloat(sizeRai.value || 0),
+        lat: parseFloat(lat.value), lng: parseFloat(lng.value)
+      };
+      let imgB64 = null;
+      if (photo.files[0]) {
+        imgB64 = await fileToBase64(photo.files[0]);
+      }
+      const res = await fetchJSON(`/parcels`, { method:'POST', body: JSON.stringify({ ...body, photo_base64: imgB64 }) });
+      state.parcels.unshift(res);
+      state.currentParcelId = res.id;
+      alert('บันทึกสำเร็จ!');
+      nav('status'); checkStatus();
+    }
+    function fileToBase64(file){
+      return new Promise((ok, err) => {
+        const rdr = new FileReader();
+        rdr.onload = () => ok(String(rdr.result).split(',')[1]);
+        rdr.onerror = err; rdr.readAsDataURL(file);
+      });
+    }
+
+    // ====== STATUS (NDWI/LSWI) ======
+    async function checkStatus(){
+      const pid = state.currentParcelId;
+      if (!pid) { setBadge(statusBadge,'ยังไม่มีแปลง', 'info'); statusText.textContent='โปรดลงทะเบียนแปลงก่อน'; return; }
+      setBadge(statusBadge,'กำลังตรวจ…','info'); statusText.textContent='';
+
+      try {
+        const s = await fetchJSON(`/parcels/${pid}/dryness`);
+        ndwi.textContent = (s.ndwi ?? 0).toFixed(3);
+        lswi.textContent = (s.lswi ?? 0).toFixed(3);
+        updated.textContent = s.updated_at || '—';
+
+        // simple threshold demo
+        let tone='info', label='ไม่ทราบ', tip='';
+        if (s.readiness === 'dry')   { tone='good'; label='พร้อมเก็บเกี่ยว (แห้ง)'; tip='เหมาะสำหรับตัด'; }
+        if (s.readiness === 'wet')   { tone='bad';  label='ยังเปียก'; tip='รอแดด/งดตัด'; }
+        if (s.readiness === 'mid')   { tone='warn'; label='กึ่งแห้ง'; tip='รออีก 2–3 วัน'; }
+        setBadge(statusBadge,label,tone);
+        statusText.textContent = tip;
+
+        // update home card
+        document.getElementById('homeStatus').textContent = label;
+        document.getElementById('homeExplain').textContent = `NDWI ${ndwi.textContent}, LSWI ${lswi.textContent}`;
+      } catch(e) {
+        setBadge(statusBadge,'ดึงข้อมูลล้มเหลว','bad');
+        statusText.textContent = 'ลองใหม่อีกครั้ง';
+      }
+    }
+
+    // ====== SHARE TO CHAT ======
+    async function shareStatus(){
+      if (!liff.isInClient()) { alert('เปิดจาก LINE เพื่อแชร์'); return; }
+      const msg = {
+        type: "flex",
+        altText: "สถานะแปลง • ความพร้อมเก็บเกี่ยว",
+        contents: flexDrynessCard({
+          title: "สถานะแปลง",
+          desc: statusText.textContent || '',
+          ndwi: ndwi.textContent, lswi: lswi.textContent,
+          updated: updated.textContent
+        })
+      };
+      await liff.sendMessages([msg]);
+      alert('ส่งแล้ว');
+    }
+
+    // ====== OFFER ======
+    function prefillOffer(){
+      moisture.value = (Number(lswi.textContent)||0) ? Math.max(0, 30 - Math.round(Number(lswi.textContent)*100)) : '';
+    }
+    async function createOffer(ev){
+      ev.preventDefault();
+      const pid = state.currentParcelId;
+      if (!pid) return alert('ยังไม่มีแปลง');
+      const body = {
+        parcel_id: pid,
+        qty_ton: parseFloat(qtyTon.value || 0),
+        moisture: parseFloat(moisture.value || 0),
+        note: note.value || ''
+      };
+      const r = await fetchJSON(`/offers`, { method:'POST', body: JSON.stringify(body) });
+      alert('ส่งคำขอแล้ว #' + r.code);
+      if (liff.isInClient()) {
+        await liff.sendMessages([{ type:"flex", altText:"คำขอเสนอราคา",
+          contents: flexOfferCard({ code: r.code, price: r.target_price || "-", qty: body.qty_ton }) }]);
+      }
+      nav('deals'); loadDeals();
+    }
+
+    // ====== DEALS ======
+    async function loadDeals(){
+      const data = await fetchJSON(`/deals?me=farmer`);
+      const box = document.getElementById('dealList'); box.innerHTML = '';
+      if (!data.length) { box.textContent = 'ยังไม่มีดีล'; return; }
+      for (const d of data) {
+        const row = document.createElement('div');
+        row.className = 'border rounded-xl p-3 flex items-center justify-between';
+        row.innerHTML = `
+          <div>
+            <div class="font-medium">#${d.code} • ${d.company_name}</div>
+            <div class="text-xs text-gray-500">ราคา: ${d.price} บาท/กก. • ปริมาณ: ${d.qty_ton} ตัน</div>
+            <div class="text-xs text-gray-500">สถานะ: ${d.status}</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 rounded-lg border" onclick="actDeal('${d.id}','accept')">รับ</button>
+            <button class="px-3 py-1 rounded-lg border" onclick="actDeal('${d.id}','reject')">ปฏิเสธ</button>
+          </div>`;
+        box.appendChild(row);
+      }
+    }
+    async function actDeal(id, action){
+      await fetchJSON(`/deals/${id}/${action}`, { method:'POST' });
+      loadDeals();
+      alert('อัปเดตแล้ว');
+    }
+
+    // ====== FLEX TEMPLATES ======
+    function flexDrynessCard({title, desc, ndwi, lswi, updated}) {
+      return {
+        type: "bubble",
+        hero: { type:"image", url:"https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop", size:"full", aspectRatio:"16:9", aspectMode:"cover" },
+        body: {
+          type:"box", layout:"vertical", spacing:"md", contents:[
+            { type:"text", text:title, weight:"bold", size:"lg" },
+            { type:"text", text:desc || "สรุปความชื้นล่าสุด", wrap:true, size:"sm", color:"#666666" },
+            { type:"box", layout:"horizontal", contents:[
+              { type:"box", layout:"vertical", contents:[
+                { type:"text", text:"NDWI", size:"xs", color:"#666" },
+                { type:"text", text:String(ndwi), weight:"bold" }
+              ]},
+              { type:"box", layout:"vertical", contents:[
+                { type:"text", text:"LSWI", size:"xs", color:"#666" },
+                { type:"text", text:String(lswi), weight:"bold" }
+              ]},
+              { type:"box", layout:"vertical", contents:[
+                { type:"text", text:"อัปเดต", size:"xs", color:"#666" },
+                { type:"text", text:String(updated), weight:"bold" }
+              ]}
+            ]}
+          ]
+        }
+      };
+    }
+    function flexOfferCard({code, price, qty}) {
+      return {
+        type:"bubble",
+        body:{ type:"box", layout:"vertical", contents:[
+          { type:"text", text:"คำขอเสนอราคา", weight:"bold", size:"lg" },
+          { type:"text", text:`รหัสคำขอ #${code}`, size:"sm", color:"#666666" },
+          { type:"box", layout:"baseline", spacing:"lg", contents:[
+            { type:"text", text:"ปริมาณ", size:"sm", color:"#666" },
+            { type:"text", text:`${qty} ตัน`, weight:"bold" }
+          ]},
+          { type:"box", layout:"baseline", spacing:"lg", contents:[
+            { type:"text", text:"ราคาเป้า", size:"sm", color:"#666" },
+            { type:"text", text:`${price} บาท/กก.`, weight:"bold" }
+          ]}
+        ] }
+      };
+    }
+  </script>
+</body>
+</html>

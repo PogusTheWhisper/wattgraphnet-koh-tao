@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a12fbbbce0945379cfd9c4c5cca78a9b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_a12fbbbce0945379cfd9c4c5cca78a9b" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a12fbbbce0945379cfd9c4c5cca78a9b = L.map(
+                "map_a12fbbbce0945379cfd9c4c5cca78a9b",
+                {
+                    center: [13.737840891742335, 100.52843568827262],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 15,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_59f806bae9963cd279bba061e04dfb55 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            var tile_layer_ad4224f89126dbad0c8a7ea40af79fcf = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Tiles \u0026copy; Esri \u0026mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_ad4224f89126dbad0c8a7ea40af79fcf.addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+            var circle_marker_e4d14f367996578f440e6469e1ab286f = L.circleMarker(
+                [13.736418765099916, 100.52524210026607],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.916628061184715, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_fde3b0b626ef5d777da0d249a9182441 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_20bf18d95d9f81cd8a90c58b210c1a1e = $(`<div id="html_20bf18d95d9f81cd8a90c58b210c1a1e" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ W=1.00</div>`)[0];
+                popup_fde3b0b626ef5d777da0d249a9182441.setContent(html_20bf18d95d9f81cd8a90c58b210c1a1e);
+            
+        
+
+        circle_marker_e4d14f367996578f440e6469e1ab286f.bindPopup(popup_fde3b0b626ef5d777da0d249a9182441)
+        ;
+
+        
+    
+    
+            var circle_marker_c69302537ae9fe2b1e59efb87f48128e = L.circleMarker(
+                [13.738963239687536, 100.52843073814955],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.921966950295484, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_57f09637ae57f1dc54aea9f5482acc20 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_78452d3f486372903a2829a746cfb08e = $(`<div id="html_78452d3f486372903a2829a746cfb08e" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี4 W=1.00</div>`)[0];
+                popup_57f09637ae57f1dc54aea9f5482acc20.setContent(html_78452d3f486372903a2829a746cfb08e);
+            
+        
+
+        circle_marker_c69302537ae9fe2b1e59efb87f48128e.bindPopup(popup_57f09637ae57f1dc54aea9f5482acc20)
+        ;
+
+        
+    
+    
+            var circle_marker_b18c8ff278a08e20ca50b445435eb1fe = L.circleMarker(
+                [13.735899096644642, 100.52550388047727],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.921966950295484, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_0d1f8e386f9a1aacc961d4129a75e9ff = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_53477137e5d88bbf87fd742184617cd3 = $(`<div id="html_53477137e5d88bbf87fd742184617cd3" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี 9 W=1.00</div>`)[0];
+                popup_0d1f8e386f9a1aacc961d4129a75e9ff.setContent(html_53477137e5d88bbf87fd742184617cd3);
+            
+        
+
+        circle_marker_b18c8ff278a08e20ca50b445435eb1fe.bindPopup(popup_0d1f8e386f9a1aacc961d4129a75e9ff)
+        ;
+
+        
+    
+    
+            var circle_marker_103d163708b1211c6f8c2043c75daab1 = L.circleMarker(
+                [13.73558133067766, 100.5309154651327],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0972222057208985, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_b1194078997878c02223e0d41e145125 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9d901819e9c00841e46f5fcd4cd00736 = $(`<div id="html_9d901819e9c00841e46f5fcd4cd00736" style="width: 100.0%; height: 100.0%;">Data_อาคารจุลจักรพงษ์ W=1.09</div>`)[0];
+                popup_b1194078997878c02223e0d41e145125.setContent(html_9d901819e9c00841e46f5fcd4cd00736);
+            
+        
+
+        circle_marker_103d163708b1211c6f8c2043c75daab1.bindPopup(popup_b1194078997878c02223e0d41e145125)
+        ;
+
+        
+    
+    
+            var circle_marker_becbea69b72a9ac214980b26ae12bf5f = L.circleMarker(
+                [13.739340161417255, 100.53355852280504],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9.569444308625854, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_d5251ea1b05341dcac6b22e94ad5f4f3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9f5d5e427a52e0a8ec90dbb49af79d50 = $(`<div id="html_9f5d5e427a52e0a8ec90dbb49af79d50" style="width: 100.0%; height: 100.0%;">Data_อาคารบรมราชกุมารี W=2.38</div>`)[0];
+                popup_d5251ea1b05341dcac6b22e94ad5f4f3.setContent(html_9f5d5e427a52e0a8ec90dbb49af79d50);
+            
+        
+
+        circle_marker_becbea69b72a9ac214980b26ae12bf5f.bindPopup(popup_d5251ea1b05341dcac6b22e94ad5f4f3)
+        ;
+
+        
+    
+    
+            var circle_marker_4ea449cf504f6bc99b3249a9836f6c77 = L.circleMarker(
+                [13.740842756926996, 100.5269634228051],
+                {"bubblingMouseEvents": true, "color": "yellow", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "yellow", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6.916628061184715, "stroke": true, "weight": 3}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_67ef93db44eb8805b2dea1c99bca9496 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fb8f5bdce99643aefab1ebcfb90c5409 = $(`<div id="html_fb8f5bdce99643aefab1ebcfb90c5409" style="width: 100.0%; height: 100.0%;">Data_อาคารวิทยนิเวศน์ W=1.00</div>`)[0];
+                popup_67ef93db44eb8805b2dea1c99bca9496.setContent(html_fb8f5bdce99643aefab1ebcfb90c5409);
+            
+        
+
+        circle_marker_4ea449cf504f6bc99b3249a9836f6c77.bindPopup(popup_67ef93db44eb8805b2dea1c99bca9496)
+        ;
+
+        
+    
+    
+            var poly_line_af7e1ccc9eb3a2bb5df5488b8c06ad44 = L.polyline(
+                [[13.736418765099916, 100.52524210026607], [13.738963239687536, 100.52843073814955]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.5333024489477722}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_2d3c635aa63b92c131003014bf9bb255 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_24ed3daae748cca31a95bb3d9c77ee50 = $(`<div id="html_24ed3daae748cca31a95bb3d9c77ee50" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ ↔ Data_อาคารจามจุรี4: 1.00</div>`)[0];
+                popup_2d3c635aa63b92c131003014bf9bb255.setContent(html_24ed3daae748cca31a95bb3d9c77ee50);
+            
+        
+
+        poly_line_af7e1ccc9eb3a2bb5df5488b8c06ad44.bindPopup(popup_2d3c635aa63b92c131003014bf9bb255)
+        ;
+
+        
+    
+    
+            var poly_line_0ec1f2d5516dd77a094cfcbc3709bf2d = L.polyline(
+                [[13.736418765099916, 100.52524210026607], [13.735899096644642, 100.52550388047727]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.537573560236387}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_2f67a9eda8d4f24940b10b25c87454af = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_75bc4b237bdbe1fae67d3844a00a354f = $(`<div id="html_75bc4b237bdbe1fae67d3844a00a354f" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ ↔ Data_อาคารจามจุรี 9: 1.00</div>`)[0];
+                popup_2f67a9eda8d4f24940b10b25c87454af.setContent(html_75bc4b237bdbe1fae67d3844a00a354f);
+            
+        
+
+        poly_line_0ec1f2d5516dd77a094cfcbc3709bf2d.bindPopup(popup_2f67a9eda8d4f24940b10b25c87454af)
+        ;
+
+        
+    
+    
+            var poly_line_1e1f099efaae606928f84442838d1520 = L.polyline(
+                [[13.736418765099916, 100.52524210026607], [13.73558133067766, 100.5309154651327]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.537573560236387}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_cd9a6d2929c74a3e9890b34e85c53dd2 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d52844efb1f3be70b4ece37b3d1b8673 = $(`<div id="html_d52844efb1f3be70b4ece37b3d1b8673" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ ↔ Data_อาคารจุลจักรพงษ์: 1.00</div>`)[0];
+                popup_cd9a6d2929c74a3e9890b34e85c53dd2.setContent(html_d52844efb1f3be70b4ece37b3d1b8673);
+            
+        
+
+        poly_line_1e1f099efaae606928f84442838d1520.bindPopup(popup_cd9a6d2929c74a3e9890b34e85c53dd2)
+        ;
+
+        
+    
+    
+            var poly_line_265407717dfa35230d2f37d3b7c19066 = L.polyline(
+                [[13.736418765099916, 100.52524210026607], [13.739340161417255, 100.53355852280504]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.6777777645767187}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_f8de60690c3c5fc0682881b0f1233637 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_759c3988ea6397a9b6fe7697f485aa0d = $(`<div id="html_759c3988ea6397a9b6fe7697f485aa0d" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ ↔ Data_อาคารบรมราชกุมารี: 1.09</div>`)[0];
+                popup_f8de60690c3c5fc0682881b0f1233637.setContent(html_759c3988ea6397a9b6fe7697f485aa0d);
+            
+        
+
+        poly_line_265407717dfa35230d2f37d3b7c19066.bindPopup(popup_f8de60690c3c5fc0682881b0f1233637)
+        ;
+
+        
+    
+    
+            var poly_line_a4ed608368c294146990c4200b5179a0 = L.polyline(
+                [[13.736418765099916, 100.52524210026607], [13.740842756926996, 100.5269634228051]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 4.655555446900684}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_775d784d79f6cc77ab26fa4d461bf6c5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_df5e3ee0b2d42b6243fed7124392f54c = $(`<div id="html_df5e3ee0b2d42b6243fed7124392f54c" style="width: 100.0%; height: 100.0%;">Data_สถานีชาร์จ ↔ Data_อาคารวิทยนิเวศน์: 2.38</div>`)[0];
+                popup_775d784d79f6cc77ab26fa4d461bf6c5.setContent(html_df5e3ee0b2d42b6243fed7124392f54c);
+            
+        
+
+        poly_line_a4ed608368c294146990c4200b5179a0.bindPopup(popup_775d784d79f6cc77ab26fa4d461bf6c5)
+        ;
+
+        
+    
+    
+            var poly_line_37ad94c70925c7a87a6ab1ae5e64ed44 = L.polyline(
+                [[13.738963239687536, 100.52843073814955], [13.735899096644642, 100.52550388047727]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.537573560236387}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_cba35bb97c3a31883d26f3206fea74b7 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_fba3bd7529cc417c243dbd37c3f126c4 = $(`<div id="html_fba3bd7529cc417c243dbd37c3f126c4" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี4 ↔ Data_อาคารจามจุรี 9: 1.00</div>`)[0];
+                popup_cba35bb97c3a31883d26f3206fea74b7.setContent(html_fba3bd7529cc417c243dbd37c3f126c4);
+            
+        
+
+        poly_line_37ad94c70925c7a87a6ab1ae5e64ed44.bindPopup(popup_cba35bb97c3a31883d26f3206fea74b7)
+        ;
+
+        
+    
+    
+            var poly_line_7c8d5914477a5370639a2ce557bfc4ac = L.polyline(
+                [[13.738963239687536, 100.52843073814955], [13.73558133067766, 100.5309154651327]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.537573560236387}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_5963146ab1259ba5218eb31edadce74e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_5418c47325f0bf2380bcafd99c1b5db4 = $(`<div id="html_5418c47325f0bf2380bcafd99c1b5db4" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี4 ↔ Data_อาคารจุลจักรพงษ์: 1.00</div>`)[0];
+                popup_5963146ab1259ba5218eb31edadce74e.setContent(html_5418c47325f0bf2380bcafd99c1b5db4);
+            
+        
+
+        poly_line_7c8d5914477a5370639a2ce557bfc4ac.bindPopup(popup_5963146ab1259ba5218eb31edadce74e)
+        ;
+
+        
+    
+    
+            var poly_line_a44446875185d441fbf9dc37e4ca68e6 = L.polyline(
+                [[13.738963239687536, 100.52843073814955], [13.739340161417255, 100.53355852280504]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.6777777645767187}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_3317f4632689edccbf034426cbaefd7a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c6840f7340b6e160d226890dd4ddd0aa = $(`<div id="html_c6840f7340b6e160d226890dd4ddd0aa" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี4 ↔ Data_อาคารบรมราชกุมารี: 1.09</div>`)[0];
+                popup_3317f4632689edccbf034426cbaefd7a.setContent(html_c6840f7340b6e160d226890dd4ddd0aa);
+            
+        
+
+        poly_line_a44446875185d441fbf9dc37e4ca68e6.bindPopup(popup_3317f4632689edccbf034426cbaefd7a)
+        ;
+
+        
+    
+    
+            var poly_line_6275c5eacfb262d7d590cbaa3756e755 = L.polyline(
+                [[13.738963239687536, 100.52843073814955], [13.740842756926996, 100.5269634228051]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 4.655555446900684}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_6026e1b3b98d07277fdb3d2a629a8b8b = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cdc7d70ffde2c3f2425396d480500dea = $(`<div id="html_cdc7d70ffde2c3f2425396d480500dea" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี4 ↔ Data_อาคารวิทยนิเวศน์: 2.38</div>`)[0];
+                popup_6026e1b3b98d07277fdb3d2a629a8b8b.setContent(html_cdc7d70ffde2c3f2425396d480500dea);
+            
+        
+
+        poly_line_6275c5eacfb262d7d590cbaa3756e755.bindPopup(popup_6026e1b3b98d07277fdb3d2a629a8b8b)
+        ;
+
+        
+    
+    
+            var poly_line_aa0f224439958e3ee1b1b6d325103f1a = L.polyline(
+                [[13.735899096644642, 100.52550388047727], [13.73558133067766, 100.5309154651327]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.5418563696943206}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_6626da1a577f8f6d024e1074d319295f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8e4575032db2b48c7cb36a1447eb39ad = $(`<div id="html_8e4575032db2b48c7cb36a1447eb39ad" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี 9 ↔ Data_อาคารจุลจักรพงษ์: 1.01</div>`)[0];
+                popup_6626da1a577f8f6d024e1074d319295f.setContent(html_8e4575032db2b48c7cb36a1447eb39ad);
+            
+        
+
+        poly_line_aa0f224439958e3ee1b1b6d325103f1a.bindPopup(popup_6626da1a577f8f6d024e1074d319295f)
+        ;
+
+        
+    
+    
+            var poly_line_9fc4d66aa9fc9af3823f9cb1f7851990 = L.polyline(
+                [[13.735899096644642, 100.52550388047727], [13.739340161417255, 100.53355852280504]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.6824511832195608}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_c703039721cee1144446ce61c53212bf = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_38c8c7d266f014d29044711ab82bfa0b = $(`<div id="html_38c8c7d266f014d29044711ab82bfa0b" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี 9 ↔ Data_อาคารบรมราชกุมารี: 1.10</div>`)[0];
+                popup_c703039721cee1144446ce61c53212bf.setContent(html_38c8c7d266f014d29044711ab82bfa0b);
+            
+        
+
+        poly_line_9fc4d66aa9fc9af3823f9cb1f7851990.bindPopup(popup_c703039721cee1144446ce61c53212bf)
+        ;
+
+        
+    
+    
+            var poly_line_385ef9977c950d83fac777515e8e7d73 = L.polyline(
+                [[13.735899096644642, 100.52550388047727], [13.740842756926996, 100.5269634228051]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 4.6657379721570775}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_36d6b1a0623eb9e032cd9daa699d40a5 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_08241ed6afb5d3de0e29f7c04b515efb = $(`<div id="html_08241ed6afb5d3de0e29f7c04b515efb" style="width: 100.0%; height: 100.0%;">Data_อาคารจามจุรี 9 ↔ Data_อาคารวิทยนิเวศน์: 2.39</div>`)[0];
+                popup_36d6b1a0623eb9e032cd9daa699d40a5.setContent(html_08241ed6afb5d3de0e29f7c04b515efb);
+            
+        
+
+        poly_line_385ef9977c950d83fac777515e8e7d73.bindPopup(popup_36d6b1a0623eb9e032cd9daa699d40a5)
+        ;
+
+        
+    
+    
+            var poly_line_45fad6015968066224dab2cf84cb02f6 = L.polyline(
+                [[13.73558133067766, 100.5309154651327], [13.739340161417255, 100.53355852280504]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2.6824511832195608}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_f6591b187269ca4703e25626f0a0fd05 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_33393f52c86d7a6fa8db87793a593474 = $(`<div id="html_33393f52c86d7a6fa8db87793a593474" style="width: 100.0%; height: 100.0%;">Data_อาคารจุลจักรพงษ์ ↔ Data_อาคารบรมราชกุมารี: 1.10</div>`)[0];
+                popup_f6591b187269ca4703e25626f0a0fd05.setContent(html_33393f52c86d7a6fa8db87793a593474);
+            
+        
+
+        poly_line_45fad6015968066224dab2cf84cb02f6.bindPopup(popup_f6591b187269ca4703e25626f0a0fd05)
+        ;
+
+        
+    
+    
+            var poly_line_942ffa2d6afdaea9c82cc715d73159fb = L.polyline(
+                [[13.73558133067766, 100.5309154651327], [13.740842756926996, 100.5269634228051]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 4.6657379721570775}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_876971ec1576092b9f6485e5158f396e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_dda730792c582c4edf61dcfde3d2a427 = $(`<div id="html_dda730792c582c4edf61dcfde3d2a427" style="width: 100.0%; height: 100.0%;">Data_อาคารจุลจักรพงษ์ ↔ Data_อาคารวิทยนิเวศน์: 2.39</div>`)[0];
+                popup_876971ec1576092b9f6485e5158f396e.setContent(html_dda730792c582c4edf61dcfde3d2a427);
+            
+        
+
+        poly_line_942ffa2d6afdaea9c82cc715d73159fb.bindPopup(popup_876971ec1576092b9f6485e5158f396e)
+        ;
+
+        
+    
+    
+            var poly_line_180fc251738124f5a9a0e2440fb36a72 = L.polyline(
+                [[13.739340161417255, 100.53355852280504], [13.740842756926996, 100.5269634228051]],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 5.0}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+        
+    
+        var popup_26e0a908d175af9e7699cfa0b6a30c24 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e5b75845387a06ba30f8898e136603ea = $(`<div id="html_e5b75845387a06ba30f8898e136603ea" style="width: 100.0%; height: 100.0%;">Data_อาคารบรมราชกุมารี ↔ Data_อาคารวิทยนิเวศน์: 2.61</div>`)[0];
+                popup_26e0a908d175af9e7699cfa0b6a30c24.setContent(html_e5b75845387a06ba30f8898e136603ea);
+            
+        
+
+        poly_line_180fc251738124f5a9a0e2440fb36a72.bindPopup(popup_26e0a908d175af9e7699cfa0b6a30c24)
+        ;
+
+        
+    
+    
+            var tile_layer_2b9b8431e4d44fb0a287c57a4d171051 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detect_retina": false, "max_native_zoom": 19, "max_zoom": 19, "min_zoom": 0, "no_wrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+            var mini_map_179923cce52aa25588909cb8afabec78 = new L.Control.MiniMap(
+                tile_layer_2b9b8431e4d44fb0a287c57a4d171051,
+                {
+  "position": "bottomright",
+  "width": 150,
+  "height": 150,
+  "collapsedWidth": 25,
+  "collapsedHeight": 25,
+  "zoomLevelOffset": -5,
+  "centerFixed": false,
+  "zoomAnimation": false,
+  "toggleDisplay": true,
+  "autoToggleDisplay": false,
+  "minimized": false,
+}
+            );
+            map_a12fbbbce0945379cfd9c4c5cca78a9b.addControl(mini_map_179923cce52aa25588909cb8afabec78);
+        
+    
+            var layer_control_703a8bf33fd6394970a25d693f92ca28_layers = {
+                base_layers : {
+                    "Streets" : tile_layer_59f806bae9963cd279bba061e04dfb55,
+                    "Satellite" : tile_layer_ad4224f89126dbad0c8a7ea40af79fcf,
+                },
+                overlays :  {
+                },
+            };
+            let layer_control_703a8bf33fd6394970a25d693f92ca28 = L.control.layers(
+                layer_control_703a8bf33fd6394970a25d693f92ca28_layers.base_layers,
+                layer_control_703a8bf33fd6394970a25d693f92ca28_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_a12fbbbce0945379cfd9c4c5cca78a9b);
+
+        
+</script>
+</html>

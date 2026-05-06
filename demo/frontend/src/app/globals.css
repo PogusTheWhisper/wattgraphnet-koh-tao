@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body {
+    background: radial-gradient(
+        1200px 600px at 10% -10%,
+        rgba(56, 189, 248, 0.08),
+        transparent 60%
+      ),
+      radial-gradient(
+        1000px 600px at 110% 10%,
+        rgba(167, 139, 250, 0.08),
+        transparent 60%
+      ),
+      #060a17;
+    color: theme("colors.brand.text");
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-brand-border bg-brand-panel/70 backdrop-blur
+      shadow-glow;
+  }
+  .card-header {
+    @apply flex items-start justify-between border-b border-brand-border/70
+      px-5 py-4;
+  }
+  .card-title {
+    @apply text-sm font-semibold tracking-wider uppercase text-slate-300;
+  }
+  .card-subtitle {
+    @apply text-[11px] uppercase tracking-widest text-slate-500 mt-0.5;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-brand-border
+      bg-brand-panel2 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider
+      text-slate-300;
+  }
+  .pill-accent {
+    @apply border-brand-accent/40 bg-brand-accent/10 text-brand-accent;
+  }
+  .pill-success {
+    @apply border-brand-success/40 bg-brand-success/10 text-brand-success;
+  }
+  .pill-warn {
+    @apply border-brand-warn/40 bg-brand-warn/10 text-brand-warn;
+  }
+  .pill-danger {
+    @apply border-brand-danger/40 bg-brand-danger/10 text-brand-danger;
+  }
+  .kbd {
+    @apply rounded border border-brand-border bg-brand-panel2 px-1.5 py-0.5
+      font-mono text-[10px] text-slate-400;
+  }
+  .divider {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-brand-border to-transparent;
+  }
+  .glow-ring {
+    box-shadow:
+      0 0 0 1px rgba(56, 189, 248, 0.35),
+      0 0 24px 0 rgba(56, 189, 248, 0.25);
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #1b2a4a;
+    border-radius: 3px;
+  }
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.glass {
+  background: linear-gradient(
+    180deg,
+    rgba(18, 29, 54, 0.6) 0%,
+    rgba(12, 20, 38, 0.65) 100%
+  );
+  backdrop-filter: blur(10px);
+}
+
+.number-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.recharts-wrapper,
+.recharts-surface {
+  outline: none;
+}
+.recharts-default-tooltip {
+  background: #0c1426 !important;
+  border: 1px solid #1b2a4a !important;
+  border-radius: 8px !important;
+}
