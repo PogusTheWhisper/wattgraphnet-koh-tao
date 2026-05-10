@@ -5,14 +5,16 @@ export type Vec3 = [number, number, number];
 export type Segment = { pos: Vec3; radius?: number };
 export type HotspotLayout = Partial<Record<string, Segment>>;
 
+// Anchors over the CITY cluster (azure-paradise: south-center buildings).
+// Tune via tune button if positions drift on other models.
 const DEFAULT_LAYOUT: HotspotLayout = {
-  "GRID-CBL": { pos: [-0.85, 0.25,  0.55], radius: 90 },
-  "DG-01":    { pos: [ 0.05, 0.30,  0.10], radius: 70 },
-  "BESS01":   { pos: [ 0.10, 0.30,  0.05], radius: 70 },
-  "PV-AGG":   { pos: [ 0.45, 0.45, -0.55], radius: 100 },
-  "LD-MAE":   { pos: [-0.50, 0.40, -0.30], radius: 110 },
-  "LD-SAI":   { pos: [-0.55, 0.40, -0.10], radius: 110 },
-  "LD-CHA":   { pos: [ 0.30, 0.40,  0.65], radius: 95 },
+  "GRID-CBL": { pos: [-0.55, 0.20,  0.50], radius: 70 },
+  "DG-01":    { pos: [-0.10, 0.20,  0.55], radius: 60 },
+  "BESS01":   { pos: [-0.05, 0.20,  0.50], radius: 60 },
+  "PV-AGG":   { pos: [ 0.30, 0.20,  0.30], radius: 90 },
+  "LD-MAE":   { pos: [-0.30, 0.20,  0.45], radius: 95 },
+  "LD-SAI":   { pos: [-0.15, 0.20,  0.50], radius: 95 },
+  "LD-CHA":   { pos: [ 0.05, 0.20,  0.55], radius: 80 },
 };
 
 export type IslandModel = {
@@ -23,10 +25,10 @@ export type IslandModel = {
 };
 
 export const ISLAND_MODELS: IslandModel[] = [
-  { id: "azure-paradise",        label: "Azure Paradise Island",   src: "/models/azure-paradise.glb",        layout: DEFAULT_LAYOUT },
-  { id: "emerald-archipelago-1", label: "Emerald Archipelago I",   src: "/models/emerald-archipelago-1.glb", layout: DEFAULT_LAYOUT },
-  { id: "emerald-archipelago-2", label: "Emerald Archipelago II",  src: "/models/emerald-archipelago-2.glb", layout: DEFAULT_LAYOUT },
-  { id: "turquoise-isle",        label: "Isle of Turquoise Water", src: "/models/turquoise-isle.glb",        layout: DEFAULT_LAYOUT },
+  { id: "azure-paradise",        label: "Azure Paradise Island",   src: "/models/min/azure-paradise.glb",        layout: DEFAULT_LAYOUT },
+  { id: "emerald-archipelago-1", label: "Emerald Archipelago I",   src: "/models/min/emerald-archipelago-1.glb", layout: DEFAULT_LAYOUT },
+  { id: "emerald-archipelago-2", label: "Emerald Archipelago II",  src: "/models/min/emerald-archipelago-2.glb", layout: DEFAULT_LAYOUT },
+  { id: "turquoise-isle",        label: "Isle of Turquoise Water", src: "/models/min/turquoise-isle.glb",        layout: DEFAULT_LAYOUT },
 ];
 
 export const DEFAULT_MODEL_ID = "azure-paradise";

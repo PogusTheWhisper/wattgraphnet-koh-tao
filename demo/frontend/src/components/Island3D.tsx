@@ -1,9 +1,13 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Decal, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
+
+// Wire meshopt decoder so compressed GLBs (gltf-transform --compress meshopt) load.
+useGLTF.setMeshoptDecoder(MeshoptDecoder as never);
 
 // Build a radial-gradient decal texture once — used by all segments.
 function makeRadialTexture(): THREE.Texture {
@@ -105,8 +109,11 @@ function IslandModel({
     scene.traverse((o) => {
       const m = o as THREE.Mesh;
       if (m.isMesh) {
-        m.castShadow = true;
-        m.receiveShadow = true;
+        m.castShadow = false;
+        m.receiveShadow = false;
+        if (m.material) {
+          (m.material as THREE.Material).needsUpdate = false;
+        }
       }
     });
     const island = findIslandMesh(scene);
@@ -318,8 +325,8 @@ function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
+      <ambientLight intensity={0.85} />
+      <directionalLight position={[5, 8, 5]} intensity={1.0} />
       <Suspense fallback={null}>
         <IslandModel src={src} onIsland={setIslandMesh} />
         {islandMesh && stations.map((s) => {
@@ -432,8 +439,8 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
     >
       <Canvas
         camera={{ position: [3, 2.2, 3], fov: 45 }}
-        dpr={[1, 2]}
-        shadows
+        dpr={[1, 1.5]}
+        gl={{ antialias: true, powerPreference: "high-performance" }}
         onCreated={onCreated}
       >
         <Scene
@@ -476,4 +483,11 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
   );
 }
 
-useGLTF.preload("/models/azure-paradise.glb");
+// Preload the env-selected model into useGLTF cache (page also has <link rel=preload>).
+if (typeof window !== "undefined") {
+  const m = resolveModel(
+    (typeof process !== "undefined" && process.env.NEXT_PUBLIC_ISLAND_MODEL) ||
+      undefined
+  );
+  useGLTF.preload(m.src);
+}
