@@ -1,42 +1,9 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Decal, Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Html, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-// Drei's useGLTF auto-detects meshopt-compressed GLBs (gltf-transform --compress meshopt)
-// when invoked with the meshopt flag — see IslandModel below.
-
-// Build a radial-gradient decal texture once — used by all segments.
-function makeRadialTexture(): THREE.Texture {
-  const size = 256;
-  const canvas =
-    typeof document !== "undefined"
-      ? document.createElement("canvas")
-      : null;
-  if (!canvas) return new THREE.Texture();
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext("2d")!;
-  const grad = ctx.createRadialGradient(
-    size / 2, size / 2, size * 0.05,
-    size / 2, size / 2, size * 0.5
-  );
-  grad.addColorStop(0.0, "rgba(255,255,255,1)");
-  grad.addColorStop(0.55, "rgba(255,255,255,0.55)");
-  grad.addColorStop(0.85, "rgba(255,255,255,0.18)");
-  grad.addColorStop(1.0, "rgba(255,255,255,0)");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-  // ring stroke
-  ctx.strokeStyle = "rgba(255,255,255,0.85)";
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.arc(size / 2, size / 2, size * 0.46, 0, Math.PI * 2);
-  ctx.stroke();
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
 import { resolveModel } from "@/lib/models";
 import type { Station } from "@/lib/api";
 
@@ -135,7 +102,6 @@ function SegmentDecal({
   setHoverId,
   kw,
   label,
-  texture,
 }: {
   id: string;
   station: Station;
@@ -147,7 +113,6 @@ function SegmentDecal({
   setHoverId: (v: string | null) => void;
   kw: number;
   label: string;
-  texture: THREE.Texture;
 }) {
   // Raycast onto the island mesh to find surface hit + normal
   const placement = useMemo(() => {
@@ -175,29 +140,19 @@ function SegmentDecal({
     Math.min(100, (kw / Math.max(50, station.capacity_kw)) * 100)
   );
 
+  // Slight lift above surface to avoid z-fighting
+  const liftedPos = useMemo(() => {
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(placement.quat);
+    return placement.pos.clone().addScaledVector(up, 0.01);
+  }, [placement]);
+
   return (
     <group>
-      <Decal
-        mesh={{ current: islandMesh } as never}
-        position={placement.pos}
-        rotation={new THREE.Euler().setFromQuaternion(placement.quat)}
-        scale={[radius * 2, radius * 2, radius * 2]}
-      >
-        <meshBasicMaterial
-          map={texture}
-          color={color}
-          transparent
-          opacity={isHover ? 0.85 : 0.45}
-          depthTest
-          depthWrite={false}
-          polygonOffset
-          polygonOffsetFactor={-10}
-        />
-      </Decal>
-
-      {/* invisible hover sphere at the segment center */}
+      {/* Flat ring + disc tangent to surface — much cheaper than Decal */}
       <mesh
-        position={placement.pos}
+        position={liftedPos}
+        quaternion={placement.quat}
+        renderOrder={2}
         onPointerOver={(e) => {
           e.stopPropagation();
           setHoverId(id);
@@ -209,8 +164,27 @@ function SegmentDecal({
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[radius * 0.8, 16, 16]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <circleGeometry args={[radius, 48]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.55 : 0.28}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          polygonOffset
+          polygonOffsetFactor={-1}
+        />
+      </mesh>
+      {/* Outer ring outline */}
+      <mesh position={liftedPos} quaternion={placement.quat} renderOrder={3}>
+        <ringGeometry args={[radius * 0.93, radius, 64]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 1 : 0.7}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+        />
       </mesh>
 
       {/* tooltip */}
@@ -303,7 +277,6 @@ function Scene({
 }) {
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [islandMesh, setIslandMesh] = useState<THREE.Mesh | null>(null);
-  const decalTexture = useMemo(() => makeRadialTexture(), []);
 
   const perStation = useMemo(() => {
     const loads = stations.filter((s) => s.type === "load");
@@ -346,7 +319,6 @@ function Scene({
               setHoverId={setHoverId}
               kw={perStation.get(s.id) ?? 0}
               label={SEGMENT_LABEL[s.type]}
-              texture={decalTexture}
             />
           );
         })}
@@ -355,74 +327,8 @@ function Scene({
   );
 }
 
-function CameraReset({
-  defaultPos,
-  defaultTarget,
-  delayMs = 1000,
-}: {
-  defaultPos: [number, number, number];
-  defaultTarget: [number, number, number];
-  delayMs?: number;
-}) {
-  const { camera, gl } = useThree();
-  // We expose a parent-controlled OrbitControls via ref through context if needed.
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    let dragging = false;
-    const dom = gl.domElement;
-    const reset = () => {
-      // Trigger a custom event so OrbitControls (lower) can reset.
-      dom.dispatchEvent(new CustomEvent("island3d-reset"));
-    };
-    const schedule = () => {
-      if (dragging) return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(reset, delayMs);
-    };
-    const onDown = () => {
-      dragging = true;
-      if (timer) clearTimeout(timer);
-    };
-    const onUp = () => {
-      dragging = false;
-      schedule();
-    };
-    dom.addEventListener("pointerdown", onDown);
-    dom.addEventListener("pointerup", onUp);
-    dom.addEventListener("pointerleave", onUp);
-    dom.addEventListener("pointercancel", onUp);
-    dom.addEventListener("wheel", schedule, { passive: true });
-    return () => {
-      dom.removeEventListener("pointerdown", onDown);
-      dom.removeEventListener("pointerup", onUp);
-      dom.removeEventListener("pointerleave", onUp);
-      dom.removeEventListener("pointercancel", onUp);
-      dom.removeEventListener("wheel", schedule);
-      if (timer) clearTimeout(timer);
-    };
-  }, [camera, gl, delayMs]);
-  return null;
-}
-
 export function Island3D({ stations, flows, modelId, className }: Props) {
   const model = useMemo(() => resolveModel(modelId), [modelId]);
-  const controlsRef = useRef<unknown>(null);
-
-  // OrbitControls reset listener: when the canvas dispatches "island3d-reset",
-  // ease the controls back to the default position via .reset()
-  const onCreated = ({ gl, camera }: { gl: THREE.WebGLRenderer; camera: THREE.Camera }) => {
-    const dom = gl.domElement;
-    const handler = () => {
-      const c = controlsRef.current as
-        | { reset?: () => void; target: THREE.Vector3 }
-        | null;
-      if (!c) return;
-      camera.position.set(3, 2.2, 3);
-      c.target.set(0, 0, 0);
-      c.reset?.();
-    };
-    dom.addEventListener("island3d-reset", handler as EventListener);
-  };
 
   return (
     <div
@@ -439,7 +345,6 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
         camera={{ position: [3, 2.2, 3], fov: 45 }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
-        onCreated={onCreated}
       >
         <Scene
           src={model.src}
@@ -448,7 +353,6 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
           layout={model.layout}
         />
         <OrbitControls
-          ref={controlsRef as never}
           enableDamping
           dampingFactor={0.08}
           enablePan={false}
@@ -457,7 +361,6 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
           minDistance={2}
           maxDistance={8}
         />
-        <CameraReset defaultPos={[3, 2.2, 3]} defaultTarget={[0, 0, 0]} />
       </Canvas>
 
       <div
