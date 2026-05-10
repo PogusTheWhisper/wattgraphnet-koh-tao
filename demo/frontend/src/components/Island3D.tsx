@@ -149,21 +149,20 @@ function HighlightOverlay({
             vec2 d2 = vWorldPos.xz - uSegPos[i].xz;
             float d = length(d2);
             float r = uSegRad[i];
-            if (d < r) {
-              float t = 1.0 - d / r;
-              // Sharp ring near edge (clear zone boundary)
-              float ring = smoothstep(0.88, 0.96, 1.0 - d / r) - smoothstep(0.96, 1.0, 1.0 - d / r);
-              // Solid interior fill
-              float fill = smoothstep(0.0, 0.6, t);
-              float pulse = i == uHoverIdx ? 1.0 : (0.92 + 0.08 * sin(uTime * 2.0 + float(i)));
-              float fillA = (i == uHoverIdx ? 0.65 : 0.42) * fill * pulse;
-              float ringA = (i == uHoverIdx ? 0.95 : 0.82) * ring;
-              float aLocal = max(fillA, ringA);
-              // Use the strongest segment at this pixel (no additive bleed)
-              if (aLocal > a) {
-                a = aLocal;
-                col = uSegCol[i];
-              }
+            if (d > r) continue;
+            float u = d / r;                           // 0 center → 1 edge
+            // Crisp ring band at the boundary (thick + AA-soft)
+            float ring = smoothstep(0.86, 0.92, u) * (1.0 - smoothstep(0.97, 1.00, u));
+            // Light fill inside (terrain readable)
+            float fill = (1.0 - smoothstep(0.0, 0.86, u));
+            float pulse = (i == uHoverIdx) ? 1.0 : (0.94 + 0.06 * sin(uTime * 2.0 + float(i)));
+            float fillA = (i == uHoverIdx ? 0.42 : 0.22) * fill * pulse;
+            float ringA = (i == uHoverIdx ? 0.95 : 0.85) * ring;
+            float aLocal = max(fillA, ringA);
+            // Pick the strongest segment per pixel — zones don't bleed into each other
+            if (aLocal > a) {
+              a = aLocal;
+              col = uSegCol[i];
             }
           }
           if (a < 0.03) discard;
@@ -302,65 +301,79 @@ function SegmentDecal({
         <Html
           position={placement.pos}
           center
-          distanceFactor={6}
+          zIndexRange={[100, 0]}
           style={{
             pointerEvents: "none",
-            transform: "translate(-50%, calc(-100% - 16px))",
+            transform: "translate(-50%, calc(-100% - 12px))",
           }}
         >
           <div
             style={{
-              minWidth: 200,
-              padding: "10px 12px",
-              borderRadius: 8,
-              background: "rgba(12, 20, 38, 0.96)",
+              minWidth: 156,
+              padding: "6px 8px",
+              borderRadius: 6,
+              background: "rgba(12, 20, 38, 0.95)",
               border: `1px solid ${color}55`,
-              boxShadow: "0 12px 32px rgba(0,0,0,0.55)",
+              boxShadow: "0 6px 18px rgba(0,0,0,0.55)",
               color: "#e2e8f0",
-              fontSize: 11,
               fontFamily:
                 "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
               textAlign: "left",
               whiteSpace: "nowrap",
+              lineHeight: 1.25,
             }}
           >
             <div
               style={{
                 color,
                 fontWeight: 700,
-                fontSize: 11,
-                letterSpacing: "0.08em",
+                fontSize: 9,
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
               }}
             >
               {label}
             </div>
-            <div
-              style={{ marginTop: 2, color: "#fff", fontSize: 13, fontWeight: 600 }}
-            >
+            <div style={{ marginTop: 1, color: "#fff", fontSize: 11, fontWeight: 600 }}>
               {station.name}
             </div>
-            <div style={{ marginTop: 6, display: "flex", gap: 12, alignItems: "baseline" }}>
-              <span style={{ color: "#94a3b8" }}>now</span>
+            <div
+              style={{
+                marginTop: 4,
+                display: "flex",
+                gap: 6,
+                alignItems: "baseline",
+              }}
+            >
               <span
                 style={{
                   color: "#fff",
-                  fontSize: 16,
+                  fontSize: 13,
                   fontWeight: 700,
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
-                {(kw / 1000).toFixed(2)} MW
+                {(kw / 1000).toFixed(2)}
               </span>
-            </div>
-            <div style={{ marginTop: 2, color: "#64748b", fontVariantNumeric: "tabular-nums" }}>
-              {(station.capacity_kw / 1000).toFixed(1)} MW capacity · {utilPct}% util
+              <span style={{ color: "#94a3b8", fontSize: 10 }}>
+                / {(station.capacity_kw / 1000).toFixed(1)} MW
+              </span>
+              <span
+                style={{
+                  marginLeft: "auto",
+                  color: "#94a3b8",
+                  fontSize: 10,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {utilPct}%
+              </span>
             </div>
             <div
               style={{
-                marginTop: 6,
-                height: 3,
-                borderRadius: 2,
+                marginTop: 4,
+                height: 2,
+                borderRadius: 1,
                 background: "#1b2a4a",
                 overflow: "hidden",
               }}
