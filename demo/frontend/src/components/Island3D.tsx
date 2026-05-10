@@ -151,25 +151,31 @@ function HighlightOverlay({
             float r = uSegRad[i];
             if (d < r) {
               float t = 1.0 - d / r;
-              float ring = smoothstep(0.86, 1.0, 1.0 - d / r);
-              float fill = pow(t, 1.6);
-              float pulse = 0.85 + 0.15 * sin(uTime * 2.4 + float(i));
-              float baseStrength = (i == uHoverIdx ? 1.4 : 0.85) * pulse;
-              float strength = (fill * 0.55 + ring * 0.9) * baseStrength;
-              col += uSegCol[i] * strength;
-              a = max(a, strength);
+              // Sharp ring near edge (clear zone boundary)
+              float ring = smoothstep(0.88, 0.96, 1.0 - d / r) - smoothstep(0.96, 1.0, 1.0 - d / r);
+              // Solid interior fill
+              float fill = smoothstep(0.0, 0.6, t);
+              float pulse = i == uHoverIdx ? 1.0 : (0.92 + 0.08 * sin(uTime * 2.0 + float(i)));
+              float fillA = (i == uHoverIdx ? 0.65 : 0.42) * fill * pulse;
+              float ringA = (i == uHoverIdx ? 0.95 : 0.82) * ring;
+              float aLocal = max(fillA, ringA);
+              // Use the strongest segment at this pixel (no additive bleed)
+              if (aLocal > a) {
+                a = aLocal;
+                col = uSegCol[i];
+              }
             }
           }
-          if (a < 0.02) discard;
-          gl_FragColor = vec4(col, min(a, 1.0));
+          if (a < 0.03) discard;
+          gl_FragColor = vec4(col, a);
         }
       `,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
       depthTest: true,
       polygonOffset: true,
-      polygonOffsetFactor: -2,
+      polygonOffsetFactor: -4,
     });
     return m;
   }, []);
@@ -273,98 +279,22 @@ function SegmentDecal({
     Math.min(100, (kw / Math.max(50, station.capacity_kw)) * 100)
   );
 
-  // Vertical beacon: pillar from surface skyward, glowing cap on top.
-  const pillarHeight = radius * (isHover ? 6 : 4.5);
-  const pillarTop = placement.pos
-    .clone()
-    .add(new THREE.Vector3(0, pillarHeight * 0.5, 0));
-  const orbTop = placement.pos
-    .clone()
-    .add(new THREE.Vector3(0, pillarHeight, 0));
-
   return (
     <group>
-      {/* Base ring on terrain — anchors the beacon to its area */}
+      {/* Hover hit target only — invisible, click-through */}
       <mesh
-        position={placement.pos.clone().add(new THREE.Vector3(0, 0.005, 0))}
-        rotation={[-Math.PI / 2, 0, 0]}
-        renderOrder={4}
-      >
-        <ringGeometry args={[radius * 0.85, radius, 64]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={isHover ? 1 : 0.85}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh
-        position={placement.pos.clone().add(new THREE.Vector3(0, 0.003, 0))}
-        rotation={[-Math.PI / 2, 0, 0]}
-        renderOrder={3}
-      >
-        <circleGeometry args={[radius * 0.85, 64]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={isHover ? 0.45 : 0.25}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-        />
-      </mesh>
-
-      {/* Vertical glowing pillar — beacon shooting up from the area */}
-      <mesh position={pillarTop} renderOrder={5}>
-        <cylinderGeometry
-          args={[radius * 0.18, radius * 0.32, pillarHeight, 24, 1, true]}
-        />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={isHover ? 0.85 : 0.55}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Outer halo around pillar */}
-      <mesh position={pillarTop} renderOrder={4}>
-        <cylinderGeometry
-          args={[radius * 0.55, radius * 0.85, pillarHeight, 24, 1, true]}
-        />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={isHover ? 0.18 : 0.08}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Glowing orb on top + invisible hover hit target */}
-      <mesh
-        position={orbTop}
-        renderOrder={6}
-        onPointerOver={(e) => {
+        position={placement.pos.clone().add(new THREE.Vector3(0, radius * 0.5, 0))}
+        onPointerOver={() => {
           setHoverId(id);
           document.body.style.cursor = "pointer";
         }}
-        onPointerOut={(e) => {
+        onPointerOut={() => {
           setHoverId(null);
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[radius * (isHover ? 0.6 : 0.45), 24, 24]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={isHover ? 0.95 : 0.8}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
+        <sphereGeometry args={[radius, 16, 16]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
       {/* tooltip */}
@@ -521,7 +451,13 @@ function Scene({
       <directionalLight position={[5, 8, 5]} intensity={1.0} />
       <Suspense fallback={null}>
         <IslandModel src={src} onIsland={setIslandMesh} />
-        {/* Shader overlay disabled — vertical pillars carry the highlight now */}
+        {islandMesh ? (
+          <HighlightOverlay
+            islandMesh={islandMesh}
+            segments={segUniforms}
+            hoverIndex={hoverIndex}
+          />
+        ) : null}
         {islandMesh && stations.map((s) => {
           const seg = layout[s.id];
           if (!seg) return null;
