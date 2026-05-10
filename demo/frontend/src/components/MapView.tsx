@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Island3D } from "@/components/Island3D";
 import { RegionMap3D } from "@/components/RegionMap3D";
-import type { CableSegment, Station } from "@/lib/api";
+import type { CableSegment, GraphEdge, Station } from "@/lib/api";
 
 type LiveFlows = {
   load_kw: number;
@@ -17,6 +17,7 @@ type Props = {
   stations: Station[];
   cableRoute?: [number, number][];
   cableSegments?: CableSegment[];
+  edges?: GraphEdge[];
   flows: LiveFlows;
   modelId?: string;
   className?: string;
@@ -28,11 +29,13 @@ export function MapView({
   stations,
   cableRoute,
   cableSegments,
+  edges,
   flows,
   modelId,
   className,
 }: Props) {
   const [mode, setMode] = useState<Mode>("satellite");
+  const [showAam, setShowAam] = useState(true);
 
   return (
     <div
@@ -44,17 +47,45 @@ export function MapView({
           stations={stations}
           cableRoute={cableRoute}
           cableSegments={cableSegments}
+          edges={showAam ? edges : undefined}
           flows={flows}
           className="h-full w-full"
         />
       ) : (
         <Island3D
           stations={stations}
+          edges={showAam ? edges : undefined}
           flows={flows}
           modelId={modelId}
           className="h-full w-full"
         />
       )}
+
+      {/* AAM toggle */}
+      <button
+        type="button"
+        onClick={() => setShowAam((v) => !v)}
+        style={{
+          position: "absolute",
+          left: 12,
+          top: 52,
+          padding: "5px 10px",
+          fontSize: 10,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: showAam ? "#0c1426" : "#cbd5e1",
+          background: showAam ? "#a78bfa" : "rgba(12,20,38,0.92)",
+          border: "1px solid #1b2a4a",
+          borderRadius: 6,
+          cursor: "pointer",
+          fontWeight: 700,
+          fontFamily:
+            "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+          zIndex: 5,
+        }}
+      >
+        AAM {showAam ? "ON" : "OFF"}
+      </button>
 
       {/* Mode toggle */}
       <div

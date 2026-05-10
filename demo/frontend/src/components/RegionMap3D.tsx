@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MLMap, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { CableSegment, Station } from "@/lib/api";
+import type { CableSegment, GraphEdge, Station } from "@/lib/api";
 
 type LiveFlows = {
   load_kw: number;
@@ -17,6 +17,7 @@ type Props = {
   stations: Station[];
   cableRoute?: [number, number][];
   cableSegments?: CableSegment[];
+  edges?: GraphEdge[];
   flows: LiveFlows;
   className?: string;
 };
@@ -145,6 +146,7 @@ export function RegionMap3D({
   stations,
   cableRoute,
   cableSegments,
+  edges,
   flows,
   className,
 }: Props) {
@@ -444,7 +446,71 @@ export function RegionMap3D({
         stationPopup.remove();
       });
     }
-  }, [loaded, spread, cableRoute, cableSegments, perStation]);
+    // ----- AAM (Adaptive Adjacency Matrix) edges -----
+    const aamId = "aam-edges";
+    const aamFc: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: edges
+        ? edges
+            .filter((e) => e.weight > 0.06 && e.source !== e.target)
+            .map((e) => {
+              const a = spread.find((s) => s.id === e.source);
+              const b = spread.find((s) => s.id === e.target);
+              if (!a || !b) return null;
+              return {
+                type: "Feature" as const,
+                geometry: {
+                  type: "LineString" as const,
+                  coordinates: [
+                    [a.lon, a.lat],
+                    [b.lon, b.lat],
+                  ],
+                },
+                properties: {
+                  weight: e.weight,
+                  source: e.source,
+                  target: e.target,
+                },
+              };
+            })
+            .filter(Boolean) as GeoJSON.Feature[]
+        : [],
+    };
+    const aamSrc = map.getSource(aamId);
+    if (aamSrc) {
+      (aamSrc as maplibregl.GeoJSONSource).setData(aamFc);
+    } else {
+      map.addSource(aamId, { type: "geojson", data: aamFc });
+      // Place under the station-glow so dots render on top
+      const before = map.getLayer("station-glow") ? "station-glow" : undefined;
+      map.addLayer(
+        {
+          id: "aam-line",
+          type: "line",
+          source: aamId,
+          layout: { "line-cap": "round", "line-join": "round" },
+          paint: {
+            "line-color": "#a78bfa",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["get", "weight"],
+              0.05, 0.6,
+              0.4, 3.5,
+            ],
+            "line-opacity": [
+              "interpolate",
+              ["linear"],
+              ["get", "weight"],
+              0.05, 0.25,
+              0.4, 0.9,
+            ],
+          },
+        },
+        before
+      );
+    }
+  }, [loaded, spread, cableRoute, cableSegments, edges, perStation]);
 
   return (
     <div
