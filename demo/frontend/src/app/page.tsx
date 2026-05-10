@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { GenerationMix } from "@/components/GenerationMix";
 import { HeroChart } from "@/components/HeroChart";
 import { HeroIntro } from "@/components/HeroIntro";
-import { RegionMap3D } from "@/components/RegionMap3D";
+import { MapView } from "@/components/MapView";
 import { KpiStrip, LiveMixKpi } from "@/components/KpiStrip";
 import { SocGauge } from "@/components/SocGauge";
 import { api } from "@/lib/api";
@@ -75,10 +75,11 @@ export default async function DashboardPage() {
             }
           />
           <CardBody className="h-[560px] p-2">
-            <RegionMap3D
+            <MapView
               stations={stations.stations}
               cableRoute={stations.cable_route}
               cableSegments={stations.cable_segments}
+              modelId={process.env.NEXT_PUBLIC_ISLAND_MODEL}
               flows={{
                 load_kw: now.load_kw,
                 pv_kw: now.pv_kw,

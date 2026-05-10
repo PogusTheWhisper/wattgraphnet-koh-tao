@@ -225,7 +225,7 @@ export function RegionMap3D({
       center: [99.95, 9.65],
       zoom: 8.4,
       pitch: 45,
-      bearing: -15,
+      bearing: 0,
       maxPitch: 75,
       fadeDuration: 0,
       attributionControl: { compact: true },
@@ -423,6 +423,39 @@ export function RegionMap3D({
       style={{ position: "relative", borderRadius: "0.75rem", overflow: "hidden" }}
     >
       <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+
+      {/* Reset view button */}
+      <button
+        type="button"
+        onClick={() =>
+          mapRef.current?.flyTo({
+            center: [99.95, 9.65],
+            zoom: 8.4,
+            pitch: 45,
+            bearing: 0,
+            duration: 900,
+          })
+        }
+        style={{
+          position: "absolute",
+          right: 12,
+          top: 116,
+          padding: "5px 10px",
+          fontSize: 10,
+          letterSpacing: "0.12em",
+          color: "#cbd5e1",
+          background: "rgba(12,20,38,0.92)",
+          border: "1px solid #1b2a4a",
+          borderRadius: 6,
+          textTransform: "uppercase",
+          cursor: "pointer",
+          fontFamily:
+            "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+        }}
+      >
+        Reset view
+      </button>
+
       <div
         style={{
           position: "absolute",
