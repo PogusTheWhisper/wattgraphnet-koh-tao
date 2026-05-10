@@ -172,5 +172,6 @@ export const api = {
   alerts: () => get<AlertsResponse>(`/api/alerts`),
   graph: () => get<GraphResponse>(`/api/graph`),
   savings: () => get<SavingsResponse>(`/api/savings`),
-  stations: () => get<{ stations: Station[] }>(`/api/stations`),
+  stations: () =>
+    get<{ stations: Station[]; cable_route?: [number, number][] }>(`/api/stations`),
 };

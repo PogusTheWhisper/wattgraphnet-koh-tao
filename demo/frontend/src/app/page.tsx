@@ -2,18 +2,15 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { GenerationMix } from "@/components/GenerationMix";
 import { HeroChart } from "@/components/HeroChart";
 import { HeroIntro } from "@/components/HeroIntro";
-import { Island3D } from "@/components/Island3D";
+import { RegionMap3D } from "@/components/RegionMap3D";
 import { KpiStrip, LiveMixKpi } from "@/components/KpiStrip";
 import { SocGauge } from "@/components/SocGauge";
 import { api } from "@/lib/api";
 import { formatNumber, formatTHB } from "@/lib/format";
-import { resolveModel } from "@/lib/models";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const modelId = process.env.NEXT_PUBLIC_ISLAND_MODEL;
-  const islandModel = resolveModel(modelId);
   const [stations, optimize, savings] = await Promise.all([
     api.stations(),
     api.optimize(0.7, 24),
@@ -31,14 +28,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Preload GLB in parallel with page HTML+JS */}
-      <link
-        rel="preload"
-        as="fetch"
-        href={islandModel.src}
-        type="model/gltf-binary"
-        crossOrigin="anonymous"
-      />
+      {/* MapLibre + ESRI satellite tiles preconnect */}
+      <link rel="preconnect" href="https://server.arcgisonline.com" />
       <HeroIntro />
 
       <KpiStrip
@@ -62,8 +53,8 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <CardHeader
-            title="Koh Tao Smart Grid"
-            subtitle="Live topology · PV ▸ BESS ▸ Hub ▸ Loads"
+            title="Gulf of Thailand · Smart Grid"
+            subtitle="Khanom ▸ Samui ▸ Phangan ▸ Koh Tao · 33 kV submarine cable"
             right={
               <div className="flex items-center gap-2 text-[11px]">
                 <span className="flex items-center gap-1 text-brand-warn">
@@ -83,9 +74,10 @@ export default async function DashboardPage() {
               </div>
             }
           />
-          <CardBody className="h-[520px] p-2">
-            <Island3D
+          <CardBody className="h-[560px] p-2">
+            <RegionMap3D
               stations={stations.stations}
+              cableRoute={stations.cable_route}
               flows={{
                 load_kw: now.load_kw,
                 pv_kw: now.pv_kw,
@@ -93,7 +85,6 @@ export default async function DashboardPage() {
                 bess_kw: now.bess_kw,
                 diesel_kw: now.diesel_kw,
               }}
-              modelId={process.env.NEXT_PUBLIC_ISLAND_MODEL}
             />
           </CardBody>
         </Card>
