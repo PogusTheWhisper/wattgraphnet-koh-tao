@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { Map as MLMap, Marker, Popup } from "maplibre-gl";
+import maplibregl, { Map as MLMap, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { CableSegment, Station } from "@/lib/api";
 
@@ -140,25 +140,6 @@ function buildPopupNode(
   return wrap;
 }
 
-function buildMarkerNode(_s: Station, color: string): HTMLElement {
-  // Dot only — popup carries the data on hover. Avoids chip stacking when
-  // multiple stations sit at near-identical lat/lon (Tao city cluster).
-  const root = el("div", "position:relative;cursor:pointer");
-  const dot = el(
-    "div",
-    `width:14px;height:14px;border-radius:50%;background:${color};
-     box-shadow:0 0 0 4px ${color}33,0 0 14px ${color};
-     border:2px solid #0c1426;transition:transform 0.12s`
-  );
-  root.appendChild(dot);
-  root.addEventListener("mouseenter", () => {
-    dot.style.transform = "scale(1.25)";
-  });
-  root.addEventListener("mouseleave", () => {
-    dot.style.transform = "scale(1)";
-  });
-  return root;
-}
 
 export function RegionMap3D({
   stations,
@@ -171,7 +152,6 @@ export function RegionMap3D({
   const spread = stations;
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
-  const markerRefs = useRef<Marker[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   const perStation = useMemo(() => {
@@ -360,34 +340,104 @@ export function RegionMap3D({
       });
     }
 
-    // Markers
-    markerRefs.current.forEach((m) => m.remove());
-    markerRefs.current = [];
+    // Stations as native circle layers (GeoJSON source) — anchored in WebGL,
+    // immune to DOM re-render drift.
+    const stationsId = "stations";
+    const fcStations: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: spread.map((s) => ({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [s.lon, s.lat] },
+        properties: {
+          id: s.id,
+          name: s.name,
+          type: s.type,
+          color: TYPE_COLOR[s.type] ?? "#38bdf8",
+          label: TYPE_LABEL[s.type] ?? s.type,
+          kw: perStation.get(s.id) ?? 0,
+          capacity_kw: s.capacity_kw,
+        },
+      })),
+    };
+    const sSrc = map.getSource(stationsId);
+    if (sSrc) {
+      (sSrc as maplibregl.GeoJSONSource).setData(fcStations);
+    } else {
+      map.addSource(stationsId, { type: "geojson", data: fcStations });
+      map.addLayer({
+        id: "station-glow",
+        type: "circle",
+        source: stationsId,
+        paint: {
+          "circle-color": ["get", "color"],
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            6, 6,
+            10, 14,
+            14, 22,
+          ],
+          "circle-opacity": 0.25,
+          "circle-blur": 0.6,
+        },
+      });
+      map.addLayer({
+        id: "station-core",
+        type: "circle",
+        source: stationsId,
+        paint: {
+          "circle-color": ["get", "color"],
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            6, 3,
+            10, 7,
+            14, 12,
+          ],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#0c1426",
+        },
+      });
 
-    spread.forEach((s) => {
-      const color = TYPE_COLOR[s.type] ?? "#38bdf8";
-      const kw = perStation.get(s.id) ?? 0;
-      const utilPct = Math.round(
-        Math.min(100, (kw / Math.max(50, s.capacity_kw)) * 100)
-      );
-      const node = buildMarkerNode(s, color);
-      const popup = new Popup({
-        offset: 18,
+      const stationPopup = new Popup({
+        offset: 14,
         closeButton: false,
         closeOnClick: false,
         className: "wgn-popup",
-      }).setDOMContent(buildPopupNode(s, kw, color, utilPct));
-
-      const marker = new Marker({ element: node, anchor: "center" })
-        .setLngLat([s.lon, s.lat])
-        .setPopup(popup)
-        .addTo(map);
-
-      node.addEventListener("mouseenter", () => marker.togglePopup());
-      node.addEventListener("mouseleave", () => marker.togglePopup());
-
-      markerRefs.current.push(marker);
-    });
+      });
+      map.on("mousemove", "station-core", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        map.getCanvas().style.cursor = "pointer";
+        const p = f.properties as Record<string, unknown>;
+        const kw = Number(p.kw);
+        const cap = Number(p.capacity_kw);
+        const utilPct = Math.round(Math.min(100, (kw / Math.max(50, cap)) * 100));
+        const node = buildPopupNode(
+          {
+            id: String(p.id),
+            name: String(p.name),
+            type: p.type as Station["type"],
+            capacity_kw: cap,
+            lat: 0,
+            lon: 0,
+          },
+          kw,
+          String(p.color),
+          utilPct
+        );
+        stationPopup
+          .setLngLat((f.geometry as GeoJSON.Point).coordinates as [number, number])
+          .setDOMContent(node)
+          .addTo(map);
+      });
+      map.on("mouseleave", "station-core", () => {
+        map.getCanvas().style.cursor = "";
+        stationPopup.remove();
+      });
+    }
   }, [loaded, spread, cableRoute, cableSegments, perStation]);
 
   return (
