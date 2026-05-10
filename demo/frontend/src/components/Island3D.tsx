@@ -278,11 +278,22 @@ function SegmentDecal({
     Math.min(100, (kw / Math.max(50, station.capacity_kw)) * 100)
   );
 
+  // Bubble dome over the area — translucent, glassy, hover-aware
+  const bubbleH = radius * 0.6;
+  const bubbleCenter = placement.pos
+    .clone()
+    .add(new THREE.Vector3(0, bubbleH * 0.55, 0));
+  const labelPos = placement.pos
+    .clone()
+    .add(new THREE.Vector3(0, bubbleH * 1.3, 0));
+
   return (
     <group>
-      {/* Hover hit target only — invisible, click-through */}
+      {/* Inner bubble fill */}
       <mesh
-        position={placement.pos.clone().add(new THREE.Vector3(0, radius * 0.5, 0))}
+        position={bubbleCenter}
+        scale={[radius, bubbleH, radius]}
+        renderOrder={4}
         onPointerOver={() => {
           setHoverId(id);
           document.body.style.cursor = "pointer";
@@ -292,9 +303,76 @@ function SegmentDecal({
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[radius, 16, 16]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <sphereGeometry args={[1, 32, 24]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.35 : 0.22}
+          depthWrite={false}
+          side={THREE.BackSide}
+        />
       </mesh>
+      {/* Outer glass shell */}
+      <mesh
+        position={bubbleCenter}
+        scale={[radius, bubbleH, radius]}
+        renderOrder={5}
+      >
+        <sphereGeometry args={[1, 32, 24]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.55 : 0.38}
+          depthWrite={false}
+          side={THREE.FrontSide}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* Base ring on terrain — anchors the bubble */}
+      <mesh
+        position={placement.pos.clone().add(new THREE.Vector3(0, 0.005, 0))}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={3}
+      >
+        <ringGeometry args={[radius * 0.92, radius * 1.0, 64]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 1 : 0.85}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Persistent label badge above bubble */}
+      <Html
+        position={labelPos}
+        center
+        zIndexRange={[10, 0]}
+        style={{ pointerEvents: "none" }}
+      >
+        <div
+          style={{
+            padding: "3px 7px",
+            borderRadius: 4,
+            background: "rgba(12, 20, 38, 0.92)",
+            border: `1px solid ${color}88`,
+            color: "#fff",
+            fontSize: 9,
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            fontFamily:
+              "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+            whiteSpace: "nowrap",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <span style={{ color }}>● </span>
+          {label} · {(kw / 1000).toFixed(1)} MW
+        </div>
+      </Html>
 
       {/* tooltip */}
       {isHover ? (
@@ -392,13 +470,16 @@ function Scene({
   stations,
   flows,
   layout,
+  hoverId,
+  setHoverId,
 }: {
   src: string;
   stations: Station[];
   flows: LiveFlows;
   layout: ReturnType<typeof resolveModel>["layout"];
+  hoverId: string | null;
+  setHoverId: (v: string | null) => void;
 }) {
-  const [hoverId, setHoverId] = useState<string | null>(null);
   const [islandMesh, setIslandMesh] = useState<THREE.Mesh | null>(null);
 
   const perStation = useMemo(() => {
@@ -464,13 +545,7 @@ function Scene({
       <directionalLight position={[5, 8, 5]} intensity={1.0} />
       <Suspense fallback={null}>
         <IslandModel src={src} onIsland={setIslandMesh} />
-        {islandMesh ? (
-          <HighlightOverlay
-            islandMesh={islandMesh}
-            segments={segUniforms}
-            hoverIndex={hoverIndex}
-          />
-        ) : null}
+        {/* Shader overlay disabled — bubbles carry the highlight */}
         {islandMesh && stations.map((s) => {
           const seg = layout[s.id];
           if (!seg) return null;
@@ -499,6 +574,7 @@ function Scene({
 
 export function Island3D({ stations, flows, modelId, className }: Props) {
   const model = useMemo(() => resolveModel(modelId), [modelId]);
+  const [hoverId, setHoverId] = useState<string | null>(null);
 
   return (
     <div
@@ -522,12 +598,14 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
           stations={stations}
           flows={flows}
           layout={model.layout}
+          hoverId={hoverId}
+          setHoverId={setHoverId}
         />
         <OrbitControls
           enableDamping
           dampingFactor={0.08}
           enablePan={false}
-          autoRotate
+          autoRotate={hoverId === null}
           autoRotateSpeed={0.6}
           minDistance={2}
           maxDistance={8}
