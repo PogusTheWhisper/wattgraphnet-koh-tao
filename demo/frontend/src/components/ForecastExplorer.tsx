@@ -5,13 +5,6 @@ import { ForecastChart } from "@/components/ForecastChart";
 import type { ForecastResponse } from "@/lib/api";
 import { cn } from "@/lib/cn";
 
-const METRICS = [
-  { label: "SB-WAPE", value: "17.93%", color: "text-brand-accent" },
-  { label: "MAE", value: "17.33 kW", color: "text-brand-accent2" },
-  { label: "RMSE", value: "29.06 kW", color: "text-brand-warn" },
-  { label: "Horizon", value: "24 h", color: "text-brand-success" },
-];
-
 export function ForecastExplorer({ data }: { data: ForecastResponse }) {
   const [selected, setSelected] = useState(data.stations[0]?.station_id ?? "");
 
@@ -21,6 +14,19 @@ export function ForecastExplorer({ data }: { data: ForecastResponse }) {
   );
 
   if (!station) return null;
+
+  const target = data.mape_target_pct ?? 10;
+  const avg = data.mape_avg_pct ?? 0;
+  const METRICS = [
+    {
+      label: "Avg MAPE (4 sources)",
+      value: `${avg.toFixed(2)}%`,
+      color: avg <= target ? "text-brand-success" : "text-brand-warn",
+    },
+    { label: "Target", value: `≤ ${target.toFixed(0)}%`, color: "text-brand-accent" },
+    { label: "SB-WAPE bench", value: `${data.sb_wape_pct.toFixed(2)}%`, color: "text-brand-accent2" },
+    { label: "Horizon", value: "24 h", color: "text-brand-success" },
+  ];
 
   const peak = Math.max(...station.points.map((p) => p.load_kw));
   const trough = Math.min(...station.points.map((p) => p.load_kw));
@@ -66,6 +72,11 @@ export function ForecastExplorer({ data }: { data: ForecastResponse }) {
                 )}
               >
                 {s.station_name}
+                {typeof s.mape_pct === "number" ? (
+                  <span className="ml-1 text-[10px] text-slate-500">
+                    {s.mape_pct.toFixed(1)}%
+                  </span>
+                ) : null}
               </button>
             ))}
           </div>

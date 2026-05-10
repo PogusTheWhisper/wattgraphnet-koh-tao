@@ -103,6 +103,34 @@ export function OptimizeConsole({ initial }: { initial: OptimizeResponse }) {
         />
       </div>
 
+      {data.savings_vs_baseline && data.baseline && data.ai ? (
+        <div className="card p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[11px] uppercase tracking-widest text-slate-500">
+                ทำตาม vs ไม่ทำตาม · AI dispatch vs baseline
+              </div>
+              <div className="mt-0.5 text-sm font-semibold text-white">
+                Diesel reduction{" "}
+                <span className="text-brand-success">
+                  {data.savings_vs_baseline.diesel_pct_reduction.toFixed(1)}%
+                </span>{" "}
+                · projected{" "}
+                <span className="text-brand-warn">
+                  {formatTHB(data.savings_vs_baseline.thb_saved_annual_est)}
+                </span>{" "}
+                / yr
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <Cmp label="Diesel litres" ai={data.ai.diesel_litres} base={data.baseline.diesel_litres} unit="L" />
+            <Cmp label="Cost" ai={data.ai.thb_cost} base={data.baseline.thb_cost} unit="฿" />
+            <Cmp label="CO₂" ai={data.ai.co2_kg} base={data.baseline.co2_kg} unit="kg" />
+          </div>
+        </div>
+      ) : null}
+
       <div className="card">
         <div className="card-header">
           <div>
@@ -181,6 +209,29 @@ function Stat({
         {value}
       </div>
       {sub ? <div className="mt-0.5 text-xs text-slate-400">{sub}</div> : null}
+    </div>
+  );
+}
+
+function Cmp({ label, ai, base, unit }: { label: string; ai: number; base: number; unit: string }) {
+  const delta = base - ai;
+  const pct = base > 0 ? (delta / base) * 100 : 0;
+  const fmt = (v: number) =>
+    unit === "฿" ? formatTHB(v) : `${formatNumber(v, 0)} ${unit}`;
+  return (
+    <div className="rounded-lg border border-brand-border bg-brand-panel2/50 p-3">
+      <div className="text-[11px] uppercase tracking-widest text-slate-500">{label}</div>
+      <div className="mt-1 flex items-baseline justify-between text-xs">
+        <span className="text-slate-400">ไม่ทำตาม</span>
+        <span className="text-slate-300 number-tabular">{fmt(base)}</span>
+      </div>
+      <div className="mt-0.5 flex items-baseline justify-between text-xs">
+        <span className="text-brand-success">ทำตาม AI</span>
+        <span className="text-white font-semibold number-tabular">{fmt(ai)}</span>
+      </div>
+      <div className="mt-2 text-[11px] text-brand-success">
+        −{fmt(delta)} ({pct.toFixed(1)}%)
+      </div>
     </div>
   );
 }

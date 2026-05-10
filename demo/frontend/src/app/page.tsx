@@ -2,15 +2,18 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { GenerationMix } from "@/components/GenerationMix";
 import { HeroChart } from "@/components/HeroChart";
 import { HeroIntro } from "@/components/HeroIntro";
-import { KohTaoMap } from "@/components/KohTaoMap";
+import { Island3D } from "@/components/Island3D";
 import { KpiStrip, LiveMixKpi } from "@/components/KpiStrip";
 import { SocGauge } from "@/components/SocGauge";
 import { api } from "@/lib/api";
 import { formatNumber, formatTHB } from "@/lib/format";
+import { resolveModel } from "@/lib/models";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const modelId = process.env.NEXT_PUBLIC_ISLAND_MODEL;
+  const islandModel = resolveModel(modelId);
   const [stations, optimize, savings] = await Promise.all([
     api.stations(),
     api.optimize(0.7, 24),
@@ -20,6 +23,7 @@ export default async function DashboardPage() {
   const now = optimize.schedule[0] ?? {
     load_kw: 0,
     pv_kw: 0,
+    grid_kw: 0,
     bess_kw: 0,
     diesel_kw: 0,
     soc_pct: 0,
@@ -27,6 +31,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Preload GLB in parallel with page HTML+JS */}
+      <link
+        rel="preload"
+        as="fetch"
+        href={islandModel.src}
+        type="model/gltf-binary"
+        crossOrigin="anonymous"
+      />
       <HeroIntro />
 
       <KpiStrip
@@ -41,6 +53,7 @@ export default async function DashboardPage() {
       <LiveMixKpi
         load={now.load_kw}
         pv={now.pv_kw}
+        grid={now.grid_kw ?? 0}
         bess={now.bess_kw}
         diesel={now.diesel_kw}
         soc={now.soc_pct}
@@ -71,14 +84,16 @@ export default async function DashboardPage() {
             }
           />
           <CardBody className="h-[520px] p-2">
-            <KohTaoMap
+            <Island3D
               stations={stations.stations}
               flows={{
                 load_kw: now.load_kw,
                 pv_kw: now.pv_kw,
+                grid_kw: now.grid_kw ?? 0,
                 bess_kw: now.bess_kw,
                 diesel_kw: now.diesel_kw,
               }}
+              modelId={process.env.NEXT_PUBLIC_ISLAND_MODEL}
             />
           </CardBody>
         </Card>
@@ -94,6 +109,7 @@ export default async function DashboardPage() {
                 pv_kw={now.pv_kw}
                 bess_kw={now.bess_kw}
                 diesel_kw={now.diesel_kw}
+                grid_kw={now.grid_kw ?? 0}
               />
             </CardBody>
           </Card>
@@ -148,9 +164,9 @@ export default async function DashboardPage() {
             24-hour load & DER forecast
           </div>
           <p className="mt-2 text-xs text-slate-400">
-            WattGraphNet learns spatial dependencies between stations and
-            predicts load with MAPE ≤ 10%. Beats PatchTST, Informer, and LSTM
-            across all 6 stations.
+            WattGraphNet predicts the 4 Koh Tao sources (Main Grid, Diesel,
+            BESS, PV) 24 h ahead with MAPE ≤ 10%. Beats PatchTST, Informer,
+            LSTM on the same data.
           </p>
         </div>
         <div className="card p-5">

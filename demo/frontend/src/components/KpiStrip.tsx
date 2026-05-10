@@ -101,24 +101,33 @@ export function KpiStrip({
 export function LiveMixKpi({
   load,
   pv,
+  grid = 0,
   bess,
   diesel,
   soc,
 }: {
   load: number;
   pv: number;
+  grid?: number;
   bess: number;
   diesel: number;
   soc: number;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
       <Kpi label="Load" value={`${(load / 1000).toFixed(2)} MW`} icon={Zap} />
       <Kpi
         label="PV"
         value={`${(pv / 1000).toFixed(2)} MW`}
         icon={Zap}
         accent="text-brand-warn"
+      />
+      <Kpi
+        label="Main Grid"
+        value={`${(grid / 1000).toFixed(2)} MW`}
+        sub="33 kV cable"
+        icon={Zap}
+        accent="text-brand-accent2"
       />
       <Kpi
         label="BESS"

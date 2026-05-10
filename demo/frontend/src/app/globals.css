@@ -22,6 +22,31 @@
       #060a17;
     color: theme("colors.brand.text");
     min-height: 100vh;
+    font-feature-settings: "ss01", "cv11", "tnum";
+    font-size: 15px;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+
+  /* Numbers always tabular mono — telemetry / SCADA feel */
+  .number-tabular,
+  .font-mono,
+  code,
+  kbd,
+  pre {
+    font-family: theme("fontFamily.mono");
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "zero", "ss02";
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.015em;
+    font-weight: 600;
+  }
+
+  /* Uppercase micro-labels — control-room style */
+  [class*="uppercase"] {
+    font-feature-settings: "ss01";
   }
 }
 
@@ -35,15 +60,15 @@
       px-5 py-4;
   }
   .card-title {
-    @apply text-sm font-semibold tracking-wider uppercase text-slate-300;
+    @apply text-[12px] font-semibold tracking-[0.18em] uppercase text-slate-200 font-mono;
   }
   .card-subtitle {
-    @apply text-[11px] uppercase tracking-widest text-slate-500 mt-0.5;
+    @apply text-[11px] uppercase tracking-[0.22em] text-slate-500 mt-1 font-mono;
   }
   .pill {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-brand-border
-      bg-brand-panel2 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wider
-      text-slate-300;
+    @apply inline-flex items-center gap-1.5 rounded-md border border-brand-border
+      bg-brand-panel2 px-2 py-[3px] text-[10px] font-semibold uppercase tracking-[0.14em]
+      text-slate-300 font-mono;
   }
   .pill-accent {
     @apply border-brand-accent/40 bg-brand-accent/10 text-brand-accent;
@@ -107,8 +132,46 @@
 .recharts-surface {
   outline: none;
 }
-.recharts-default-tooltip {
+.recharts-default-tooltip,
+.recharts-tooltip-wrapper .recharts-default-tooltip {
   background: #0c1426 !important;
-  border: 1px solid #1b2a4a !important;
+  border: 1px solid #38bdf855 !important;
   border-radius: 8px !important;
+  padding: 8px 10px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+.recharts-default-tooltip .recharts-tooltip-label,
+.recharts-tooltip-wrapper .recharts-tooltip-label {
+  color: #e2e8f0 !important;
+  font-family: theme("fontFamily.mono");
+  font-size: 11px !important;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px !important;
+}
+.recharts-default-tooltip .recharts-tooltip-item,
+.recharts-tooltip-wrapper .recharts-tooltip-item {
+  color: #cbd5e1 !important;
+  font-family: theme("fontFamily.mono");
+  font-size: 12px !important;
+  padding: 2px 0 !important;
+  font-variant-numeric: tabular-nums;
+}
+.recharts-default-tooltip .recharts-tooltip-item-name,
+.recharts-default-tooltip .recharts-tooltip-item-separator {
+  color: #94a3b8 !important;
+}
+.recharts-default-tooltip .recharts-tooltip-item-value,
+.recharts-default-tooltip .recharts-tooltip-item-unit {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+.recharts-cartesian-axis-tick text {
+  fill: #94a3b8 !important;
+  font-size: 11px !important;
+  font-family: theme("fontFamily.mono");
+}
+.recharts-legend-item-text {
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
 }

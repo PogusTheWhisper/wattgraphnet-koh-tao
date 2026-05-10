@@ -1,1 +1,40 @@
-"data/pems_node_values.npy" 
+# IDE / editor
+.claude/
+.vscode/
+.idea/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.turbo/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (large, not for repo)
+data/pems_node_values.npy
+data/raw/
+data/cleaned/
+data/preprocessed/
+logs/
+results/
+models/autogluon/
+models/pytorch/
+
+# Notebook checkpoints
+.ipynb_checkpoints/

@@ -124,9 +124,37 @@ export default async function AlertsPage() {
                         </div>
                       </div>
                     </div>
-                    <p className="flex-1 text-sm leading-relaxed text-slate-300">
-                      {a.message}
-                    </p>
+                    <div className="flex-1">
+                      <p className="text-sm leading-relaxed text-slate-300">
+                        {a.message}
+                      </p>
+                      {a.recommendation ? (
+                        <div className="mt-3 rounded-lg border border-brand-border bg-brand-panel2/50 p-3">
+                          <div className="text-[10px] uppercase tracking-widest text-slate-500">
+                            Actionable recommendation · Source / Amount / Time
+                          </div>
+                          <ul className="mt-2 flex flex-col gap-1.5 text-xs text-slate-300">
+                            {a.recommendation.actions.map((act, i) => (
+                              <li key={i} className="flex flex-wrap items-baseline gap-1.5">
+                                <span className="pill pill-accent">{act.source}</span>
+                                <span className="text-white font-semibold">
+                                  {act.action} {(act.amount_kw / 1000).toFixed(2)} MW
+                                </span>
+                                <span className="text-slate-500">
+                                  {new Date(act.from).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                  {" → "}
+                                  {new Date(act.to).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                                <span className="text-slate-400">— {act.reason}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="mt-2 text-[11px] text-brand-success">
+                            ⇒ {a.recommendation.expected_outcome}
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <div className="text-[10px] uppercase tracking-widest text-slate-500">
                         Lead time

@@ -14,12 +14,14 @@ type Props = {
   pv_kw: number;
   bess_kw: number; // positive discharge, negative charge
   diesel_kw: number;
+  grid_kw?: number;
 };
 
-export function GenerationMix({ pv_kw, bess_kw, diesel_kw }: Props) {
+export function GenerationMix({ pv_kw, bess_kw, diesel_kw, grid_kw = 0 }: Props) {
   const bess = Math.max(0, bess_kw);
   const data = [
     { name: "Solar PV", value: Math.max(0, pv_kw), color: "#fbbf24" },
+    { name: "Main Grid", value: Math.max(0, grid_kw), color: "#a78bfa" },
     { name: "BESS", value: bess, color: "#38bdf8" },
     { name: "Diesel", value: Math.max(0, diesel_kw), color: "#f87171" },
   ];

@@ -27,13 +27,21 @@ const config: Config = {
       fontFamily: {
         sans: [
           "var(--font-sans)",
+          "var(--font-thai)",
           "system-ui",
           "-apple-system",
           "Segoe UI",
           "Roboto",
           "sans-serif",
         ],
-        mono: ["JetBrains Mono", "SFMono-Regular", "ui-monospace", "monospace"],
+        mono: [
+          "var(--font-mono)",
+          "SFMono-Regular",
+          "ui-monospace",
+          "Menlo",
+          "monospace",
+        ],
+        thai: ["var(--font-thai)", "system-ui", "sans-serif"],
       },
       boxShadow: {
         glow: "0 0 40px -10px rgba(56, 189, 248, 0.35)",

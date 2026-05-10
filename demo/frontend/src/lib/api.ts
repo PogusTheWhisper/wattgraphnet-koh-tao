@@ -29,9 +29,13 @@ export type ForecastPoint = {
   upper_kw: number;
 };
 
+export type SourceType = "main_grid" | "diesel" | "bess" | "pv";
+
 export type StationForecast = {
   station_id: string;
   station_name: string;
+  source_type?: SourceType;
+  mape_pct?: number;
   points: ForecastPoint[];
 };
 
@@ -39,17 +43,37 @@ export type ForecastResponse = {
   meta: Meta;
   stations: StationForecast[];
   sb_wape_pct: number;
+  mape_per_source?: Record<SourceType, number>;
+  mape_avg_pct?: number;
+  mape_target_pct?: number;
 };
 
 export type DispatchPoint = {
   t: string;
   load_kw: number;
   pv_kw: number;
+  grid_kw?: number;
   bess_kw: number;
   diesel_kw: number;
   soc_pct: number;
   thb_saved: number;
   co2_saved_kg: number;
+};
+
+export type CompareTotals = {
+  diesel_kwh: number;
+  diesel_litres: number;
+  thb_cost: number;
+  co2_kg: number;
+};
+
+export type SavingsVsBaseline = {
+  diesel_kwh_avoided: number;
+  diesel_litres_avoided: number;
+  thb_saved_today: number;
+  thb_saved_annual_est: number;
+  co2_kg_avoided_today: number;
+  diesel_pct_reduction: number;
 };
 
 export type OptimizeResponse = {
@@ -62,9 +86,27 @@ export type OptimizeResponse = {
     pv_kwh: number;
     bess_kwh: number;
     diesel_kwh: number;
+    grid_kwh?: number;
     thb_saved: number;
     co2_saved_kg: number;
   };
+  baseline?: CompareTotals;
+  ai?: CompareTotals;
+  savings_vs_baseline?: SavingsVsBaseline;
+};
+
+export type AlertAction = {
+  source: string;
+  action: "charge" | "discharge" | "stage" | "ramp" | string;
+  amount_kw: number;
+  from: string;
+  to: string;
+  reason: string;
+};
+
+export type AlertRecommendation = {
+  actions: AlertAction[];
+  expected_outcome: string;
 };
 
 export type Alert = {
@@ -76,6 +118,8 @@ export type Alert = {
   station_id: string;
   issued_at: string;
   eta: string;
+  scenario?: string;
+  recommendation?: AlertRecommendation;
 };
 
 export type AlertsResponse = {
@@ -88,7 +132,7 @@ export type Station = {
   name: string;
   lat: number;
   lon: number;
-  type: "substation" | "load" | "pv" | "bess" | "diesel";
+  type: "substation" | "load" | "pv" | "bess" | "diesel" | "main_grid";
   capacity_kw: number;
 };
 
