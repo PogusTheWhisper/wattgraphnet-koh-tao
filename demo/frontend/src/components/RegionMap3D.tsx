@@ -160,34 +160,6 @@ function buildMarkerNode(_s: Station, color: string): HTMLElement {
   return root;
 }
 
-// Spread stations that share near-identical lat/lon so they don't stack into
-// a single dot. Adjusts in-place at small angular offset (≈ 80–200 m).
-function spreadStations(stations: Station[]): Station[] {
-  const groups = new Map<string, Station[]>();
-  for (const s of stations) {
-    const key = `${s.lat.toFixed(2)}_${s.lon.toFixed(2)}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(s);
-  }
-  const out: Station[] = [];
-  for (const group of groups.values()) {
-    if (group.length <= 1) {
-      out.push(...group);
-      continue;
-    }
-    const radius = 0.0018; // ~200 m at this latitude
-    group.forEach((s, i) => {
-      const angle = (2 * Math.PI * i) / group.length;
-      out.push({
-        ...s,
-        lat: s.lat + radius * Math.cos(angle),
-        lon: s.lon + radius * Math.sin(angle),
-      });
-    });
-  }
-  return out;
-}
-
 export function RegionMap3D({
   stations,
   cableRoute,
@@ -195,7 +167,8 @@ export function RegionMap3D({
   flows,
   className,
 }: Props) {
-  const spread = useMemo(() => spreadStations(stations), [stations]);
+  // Use raw lat/lon — spread function was offsetting markers wrong on dense clusters.
+  const spread = stations;
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
@@ -222,9 +195,9 @@ export function RegionMap3D({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: STYLE,
-      center: [99.95, 9.65],
-      zoom: 8.4,
-      pitch: 45,
+      center: [99.93, 9.7],
+      zoom: 9.2,
+      pitch: 30,
       bearing: 0,
       maxPitch: 75,
       fadeDuration: 0,
@@ -429,9 +402,9 @@ export function RegionMap3D({
         type="button"
         onClick={() =>
           mapRef.current?.flyTo({
-            center: [99.95, 9.65],
-            zoom: 8.4,
-            pitch: 45,
+            center: [99.93, 9.7],
+            zoom: 9.2,
+            pitch: 30,
             bearing: 0,
             duration: 900,
           })
