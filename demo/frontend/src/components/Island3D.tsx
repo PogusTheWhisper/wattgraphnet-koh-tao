@@ -623,24 +623,6 @@ export function Island3D({ stations, flows, modelId, className }: Props) {
           maxDistance={8}
         />
       </Canvas>
-
-      <div
-        style={{
-          position: "absolute",
-          left: 12,
-          bottom: 12,
-          padding: "6px 10px",
-          fontSize: 10,
-          letterSpacing: "0.08em",
-          color: "#94a3b8",
-          background: "rgba(12,20,38,0.7)",
-          border: "1px solid #1b2a4a",
-          borderRadius: 6,
-          textTransform: "uppercase",
-        }}
-      >
-        {model.label}
-      </div>
     </div>
   );
 }

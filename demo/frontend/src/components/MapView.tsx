@@ -76,12 +76,12 @@ export function MapView({
         <ToggleBtn
           active={mode === "satellite"}
           onClick={() => setMode("satellite")}
-          label="Satellite"
+          label="Powerline"
         />
         <ToggleBtn
           active={mode === "island3d"}
           onClick={() => setMode("island3d")}
-          label="3D Model"
+          label="Grid Consumption"
         />
       </div>
     </div>

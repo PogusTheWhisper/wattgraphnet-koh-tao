@@ -180,6 +180,12 @@ export function RegionMap3D({
       pitch: 30,
       bearing: 0,
       maxPitch: 75,
+      minZoom: 8.5,
+      maxZoom: 14,
+      maxBounds: [
+        [99.0, 8.7],   // SW: south of Khanom, west of mainland coast
+        [100.7, 10.4], // NE: north of Koh Tao, east of Phangan
+      ],
       fadeDuration: 0,
       attributionControl: { compact: true },
     });
@@ -481,26 +487,6 @@ export function RegionMap3D({
       >
         Reset view
       </button>
-
-      <div
-        style={{
-          position: "absolute",
-          left: 12,
-          bottom: 12,
-          padding: "6px 10px",
-          fontSize: 10,
-          letterSpacing: "0.08em",
-          color: "#cbd5e1",
-          background: "rgba(12,20,38,0.78)",
-          border: "1px solid #1b2a4a",
-          borderRadius: 6,
-          textTransform: "uppercase",
-          fontFamily:
-            "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
-        }}
-      >
-        Khanom · Samui · Phangan · Koh Tao · 33 kV submarine cable
-      </div>
     </div>
   );
 }
