@@ -273,24 +273,98 @@ function SegmentDecal({
     Math.min(100, (kw / Math.max(50, station.capacity_kw)) * 100)
   );
 
+  // Vertical beacon: pillar from surface skyward, glowing cap on top.
+  const pillarHeight = radius * (isHover ? 6 : 4.5);
+  const pillarTop = placement.pos
+    .clone()
+    .add(new THREE.Vector3(0, pillarHeight * 0.5, 0));
+  const orbTop = placement.pos
+    .clone()
+    .add(new THREE.Vector3(0, pillarHeight, 0));
+
   return (
     <group>
-      {/* Invisible click/hover sphere at segment center (cheap pointer test) */}
+      {/* Base ring on terrain — anchors the beacon to its area */}
       <mesh
-        position={placement.pos}
+        position={placement.pos.clone().add(new THREE.Vector3(0, 0.005, 0))}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={4}
+      >
+        <ringGeometry args={[radius * 0.85, radius, 64]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 1 : 0.85}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh
+        position={placement.pos.clone().add(new THREE.Vector3(0, 0.003, 0))}
+        rotation={[-Math.PI / 2, 0, 0]}
+        renderOrder={3}
+      >
+        <circleGeometry args={[radius * 0.85, 64]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.45 : 0.25}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Vertical glowing pillar — beacon shooting up from the area */}
+      <mesh position={pillarTop} renderOrder={5}>
+        <cylinderGeometry
+          args={[radius * 0.18, radius * 0.32, pillarHeight, 24, 1, true]}
+        />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.85 : 0.55}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Outer halo around pillar */}
+      <mesh position={pillarTop} renderOrder={4}>
+        <cylinderGeometry
+          args={[radius * 0.55, radius * 0.85, pillarHeight, 24, 1, true]}
+        />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.18 : 0.08}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+
+      {/* Glowing orb on top + invisible hover hit target */}
+      <mesh
+        position={orbTop}
+        renderOrder={6}
         onPointerOver={(e) => {
-          e.stopPropagation();
           setHoverId(id);
           document.body.style.cursor = "pointer";
         }}
         onPointerOut={(e) => {
-          e.stopPropagation();
           setHoverId(null);
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[radius * 0.85, 12, 12]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        <sphereGeometry args={[radius * (isHover ? 0.6 : 0.45), 24, 24]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={isHover ? 0.95 : 0.8}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
       </mesh>
 
       {/* tooltip */}
@@ -447,13 +521,7 @@ function Scene({
       <directionalLight position={[5, 8, 5]} intensity={1.0} />
       <Suspense fallback={null}>
         <IslandModel src={src} onIsland={setIslandMesh} />
-        {islandMesh ? (
-          <HighlightOverlay
-            islandMesh={islandMesh}
-            segments={segUniforms}
-            hoverIndex={hoverIndex}
-          />
-        ) : null}
+        {/* Shader overlay disabled — vertical pillars carry the highlight now */}
         {islandMesh && stations.map((s) => {
           const seg = layout[s.id];
           if (!seg) return null;
