@@ -127,6 +127,16 @@ export type AlertsResponse = {
   alerts: Alert[];
 };
 
+export type CableSegment = {
+  id: string;
+  name: string;
+  voltage_kv: number;
+  circuits: number;
+  length_km: number;
+  status: "operational" | "planned-2029" | string;
+  coords: [number, number][];
+};
+
 export type Station = {
   id: string;
   name: string;
@@ -173,5 +183,9 @@ export const api = {
   graph: () => get<GraphResponse>(`/api/graph`),
   savings: () => get<SavingsResponse>(`/api/savings`),
   stations: () =>
-    get<{ stations: Station[]; cable_route?: [number, number][] }>(`/api/stations`),
+    get<{
+      stations: Station[];
+      cable_route?: [number, number][];
+      cable_segments?: CableSegment[];
+    }>(`/api/stations`),
 };

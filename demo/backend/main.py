@@ -41,35 +41,81 @@ DIESEL_KGCO2_PER_KWH = 0.74
 GRID_KGCO2_PER_KWH = 0.40
 PV_KGCO2_PER_KWH = 0.0
 
-# ----- Topology (Koh Tao pilot + regional context) -----
-# Capacities reflect the spec: 24 MW cable, 10 MW diesel, 50 MWh BESS.
-# Real lat/lon for the Gulf of Thailand archipelago: Khanom (mainland) →
-# Samui → Phangan → Koh Tao submarine cable route.
+# ----- Topology — actual PEA daisy-chain (Khanom → Samui → Phangan → Koh Tao) -----
+# Khanom→Samui: 115 kV + 33 kV (4 circuits) · Samui→Phangan: 33 kV (2 circuits)
+# Phangan→Koh Tao: 33 kV (45 km, single radial circuit, ~24 MW thermal limit).
+# Future 230 kV megaproject (EGAT, 11.23 B THB, ETA 2029-06): Khanom→Samui 200 MW.
 STATIONS = [
-    # Mainland source — 230 kV grid termination at Khanom
-    {"id": "KHANOM",   "name": "Khanom 230kV Substation", "lat": 9.2000, "lon": 99.8500, "type": "main_grid",  "capacity_kw": 80000},
-    # Submarine cable hops
-    {"id": "SAMUI",    "name": "Koh Samui Substation",    "lat": 9.5120, "lon": 100.0136, "type": "substation", "capacity_kw": 60000},
-    {"id": "PHANGAN",  "name": "Koh Phangan Substation",  "lat": 9.7330, "lon": 100.0050, "type": "substation", "capacity_kw": 35000},
-    {"id": "GRID-CBL", "name": "Koh Tao Cable Landing",   "lat": 10.0810, "lon": 99.8410, "type": "substation", "capacity_kw": 24000},
-    # Koh Tao local DERs + loads
-    {"id": "DG-01",    "name": "Koh Tao Diesel Plant",   "lat": 10.0945, "lon": 99.8360, "type": "diesel", "capacity_kw": 10000},
-    {"id": "BESS01",   "name": "Koh Tao BESS (50 MWh)",  "lat": 10.0950, "lon": 99.8350, "type": "bess",   "capacity_kw": 12500},
-    {"id": "PV-AGG",   "name": "Koh Tao PV Aggregate",   "lat": 10.1000, "lon": 99.8260, "type": "pv",     "capacity_kw": 4000},
-    {"id": "LD-MAE",   "name": "Mae Haad Load",          "lat": 10.0997, "lon": 99.8264, "type": "load",   "capacity_kw": 3500},
-    {"id": "LD-SAI",   "name": "Sairee Load",            "lat": 10.0991, "lon": 99.8226, "type": "load",   "capacity_kw": 4500},
-    {"id": "LD-CHA",   "name": "Chalok Baan Kao Load",   "lat": 10.0667, "lon": 99.8350, "type": "load",   "capacity_kw": 2000},
+    # Mainland source — Khanom thermal power station
+    {"id": "KHANOM",     "name": "Khanom Power Station (Mainland)", "lat": 9.2000,  "lon": 99.8500,  "type": "main_grid",  "capacity_kw": 200000},
+    # Samui — primary demand sink, sets the bottleneck
+    {"id": "SAMUI-SUB",  "name": "Samui Substation (115 kV)",       "lat": 9.5120,  "lon": 100.0136, "type": "substation", "capacity_kw": 120000},
+    {"id": "SAMUI-LD",   "name": "Koh Samui Load",                  "lat": 9.5120,  "lon": 100.0500, "type": "load",       "capacity_kw": 80000},
+    {"id": "SAMUI-BESS", "name": "Samui BESS (25 MW)",              "lat": 9.5400,  "lon": 100.0500, "type": "bess",       "capacity_kw": 25000},
+    # Phangan — middle node
+    {"id": "PHANGAN-SUB","name": "Koh Phangan Substation (33 kV)",  "lat": 9.7330,  "lon": 100.0050, "type": "substation", "capacity_kw": 35000},
+    {"id": "PHANGAN-LD", "name": "Koh Phangan Load",                "lat": 9.7400,  "lon": 100.0300, "type": "load",       "capacity_kw": 22000},
+    # Koh Tao — terminal node (45 km submarine cable, 33 kV)
+    {"id": "GRID-CBL",   "name": "Koh Tao Cable Landing (33 kV)",   "lat": 10.0810, "lon": 99.8410,  "type": "substation", "capacity_kw": 24000},
+    {"id": "DG-01",      "name": "Koh Tao Diesel Plant (10 MW)",    "lat": 10.0945, "lon": 99.8360,  "type": "diesel",     "capacity_kw": 10000},
+    {"id": "BESS01",     "name": "Koh Tao BESS (50 MWh)",           "lat": 10.0950, "lon": 99.8350,  "type": "bess",       "capacity_kw": 12500},
+    {"id": "PV-AGG",     "name": "Koh Tao PV Aggregate",            "lat": 10.1000, "lon": 99.8260,  "type": "pv",         "capacity_kw": 4000},
+    {"id": "LD-MAE",     "name": "Mae Haad Load",                   "lat": 10.0997, "lon": 99.8264,  "type": "load",       "capacity_kw": 3500},
+    {"id": "LD-SAI",     "name": "Sairee Load",                     "lat": 10.0991, "lon": 99.8226,  "type": "load",       "capacity_kw": 4500},
+    {"id": "LD-CHA",     "name": "Chalok Baan Kao Load",            "lat": 10.0667, "lon": 99.8350,  "type": "load",       "capacity_kw": 2000},
 ]
 
-# Submarine + onshore cable route (LineString coordinates [lon, lat])
-CABLE_ROUTE = [
-    [99.8500, 9.2000],   # Khanom mainland
-    [99.9500, 9.3500],   # offshore
-    [100.0136, 9.5120],  # Samui
-    [100.0050, 9.7330],  # Phangan
-    [99.9000, 9.9000],   # offshore
-    [99.8410, 10.0810],  # Koh Tao landing
+# Cable network — broken into segments so the map can render voltage tiers + tooltips.
+CABLE_SEGMENTS = [
+    {
+        "id": "khanom-samui",
+        "name": "Khanom ↔ Samui",
+        "voltage_kv": 115,
+        "circuits": 4,
+        "length_km": 32,
+        "status": "operational",
+        "coords": [
+            [99.8500, 9.2000], [99.8900, 9.2700], [99.9400, 9.3500],
+            [99.9900, 9.4400], [100.0136, 9.5120],
+        ],
+    },
+    {
+        "id": "samui-phangan",
+        "name": "Samui ↔ Phangan",
+        "voltage_kv": 33,
+        "circuits": 2,
+        "length_km": 18,
+        "status": "operational",
+        "coords": [[100.0136, 9.5120], [100.0100, 9.6300], [100.0050, 9.7330]],
+    },
+    {
+        "id": "phangan-tao",
+        "name": "Phangan ↔ Koh Tao (radial)",
+        "voltage_kv": 33,
+        "circuits": 1,
+        "length_km": 45,
+        "status": "operational",
+        "coords": [
+            [100.0050, 9.7330], [99.9700, 9.8200], [99.9300, 9.9100],
+            [99.8800, 9.9900], [99.8410, 10.0810],
+        ],
+    },
+    {
+        "id": "future-230kv",
+        "name": "Khanom ↔ Samui · 230 kV (EGAT 2029)",
+        "voltage_kv": 230,
+        "circuits": 1,
+        "length_km": 32,
+        "status": "planned-2029",
+        "coords": [
+            [99.8500, 9.2000], [99.9000, 9.2900], [99.9700, 9.3900],
+            [100.0050, 9.4700], [100.0136, 9.5120],
+        ],
+    },
 ]
+
+# Backwards-compatible flat coordinate list (legacy)
+CABLE_ROUTE = [c for seg in CABLE_SEGMENTS if seg["status"] == "operational" for c in seg["coords"]]
 
 BESS_CAPACITY_KWH = 50_000
 BESS_POWER_KW = 12_500
@@ -146,7 +192,11 @@ def healthz():
 
 @app.get("/api/stations")
 def stations():
-    return {"stations": STATIONS, "cable_route": CABLE_ROUTE}
+    return {
+        "stations": STATIONS,
+        "cable_route": CABLE_ROUTE,
+        "cable_segments": CABLE_SEGMENTS,
+    }
 
 
 @app.get("/api/forecast")

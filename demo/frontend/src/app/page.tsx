@@ -78,6 +78,7 @@ export default async function DashboardPage() {
             <RegionMap3D
               stations={stations.stations}
               cableRoute={stations.cable_route}
+              cableSegments={stations.cable_segments}
               flows={{
                 load_kw: now.load_kw,
                 pv_kw: now.pv_kw,
