@@ -34,6 +34,7 @@ function project(stations: Station[]) {
 }
 
 const TYPE_COLORS: Record<Station["type"], string> = {
+  main_grid: "#38bdf8",
   substation: "#38bdf8",
   load: "#a78bfa",
   pv: "#fbbf24",
@@ -42,6 +43,7 @@ const TYPE_COLORS: Record<Station["type"], string> = {
 };
 
 const TYPE_LABEL: Record<Station["type"], string> = {
+  main_grid: "GRID",
   substation: "HUB",
   load: "LOAD",
   pv: "PV",

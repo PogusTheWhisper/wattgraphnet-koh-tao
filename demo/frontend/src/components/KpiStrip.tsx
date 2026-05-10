@@ -13,7 +13,7 @@ type KpiProps = {
   label: string;
   value: string;
   sub?: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   trend?: "up" | "down" | "flat";
   accent?: string;
 };

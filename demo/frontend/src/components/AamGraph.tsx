@@ -24,6 +24,7 @@ function layout(stations: Station[]): Record<string, { x: number; y: number }> {
 
 const TYPE_COLORS: Record<Station["type"], string> = {
   substation: "#38bdf8",
+  main_grid: "#38bdf8",
   load: "#a78bfa",
   pv: "#fbbf24",
   bess: "#34d399",

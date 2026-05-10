@@ -4,10 +4,8 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Decal, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-
-// Wire meshopt decoder so compressed GLBs (gltf-transform --compress meshopt) load.
-useGLTF.setMeshoptDecoder(MeshoptDecoder as never);
+// Drei's useGLTF auto-detects meshopt-compressed GLBs (gltf-transform --compress meshopt)
+// when invoked with the meshopt flag — see IslandModel below.
 
 // Build a radial-gradient decal texture once — used by all segments.
 function makeRadialTexture(): THREE.Texture {
@@ -104,7 +102,7 @@ function IslandModel({
   onIsland: (m: THREE.Mesh) => void;
   children?: React.ReactNode;
 }) {
-  const { scene } = useGLTF(src);
+  const { scene } = useGLTF(src, undefined, true);
   useEffect(() => {
     scene.traverse((o) => {
       const m = o as THREE.Mesh;
@@ -207,7 +205,7 @@ function SegmentDecal({
         }}
         onPointerOut={(e) => {
           e.stopPropagation();
-          setHoverId((cur) => (cur === id ? null : cur));
+          setHoverId(null);
           document.body.style.cursor = "auto";
         }}
       >
@@ -489,5 +487,5 @@ if (typeof window !== "undefined") {
     (typeof process !== "undefined" && process.env.NEXT_PUBLIC_ISLAND_MODEL) ||
       undefined
   );
-  useGLTF.preload(m.src);
+  useGLTF.preload(m.src, undefined, true);
 }
