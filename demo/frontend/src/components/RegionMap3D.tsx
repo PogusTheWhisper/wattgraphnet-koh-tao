@@ -395,7 +395,10 @@ export function RegionMap3D({
       className={className ?? "relative h-[520px] w-full"}
       style={{ position: "relative", borderRadius: "0.75rem", overflow: "hidden" }}
     >
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+      <div
+        ref={containerRef}
+        style={{ position: "absolute", inset: 0 }}
+      />
 
       {/* Reset view button */}
       <button
