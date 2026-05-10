@@ -11,11 +11,10 @@ import { formatNumber, formatTHB } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [stations, optimize, savings, graph] = await Promise.all([
+  const [stations, optimize, savings] = await Promise.all([
     api.stations(),
     api.optimize(0.7, 24),
     api.savings(),
-    api.graph(),
   ]);
 
   const now = optimize.schedule[0] ?? {
@@ -80,7 +79,6 @@ export default async function DashboardPage() {
               stations={stations.stations}
               cableRoute={stations.cable_route}
               cableSegments={stations.cable_segments}
-              edges={graph.edges}
               modelId={process.env.NEXT_PUBLIC_ISLAND_MODEL}
               flows={{
                 load_kw: now.load_kw,

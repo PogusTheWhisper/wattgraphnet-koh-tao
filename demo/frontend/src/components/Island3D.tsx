@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { resolveModel } from "@/lib/models";
-import type { GraphEdge, Station } from "@/lib/api";
+import type { Station } from "@/lib/api";
 
 type LiveFlows = {
   load_kw: number;
@@ -17,7 +17,6 @@ type LiveFlows = {
 
 type Props = {
   stations: Station[];
-  edges?: GraphEdge[];
   flows: LiveFlows;
   modelId?: string;
   className?: string;
@@ -481,7 +480,6 @@ function SegmentDecal({
 function Scene({
   src,
   stations,
-  edges,
   flows,
   layout,
   hoverId,
@@ -489,7 +487,6 @@ function Scene({
 }: {
   src: string;
   stations: Station[];
-  edges?: GraphEdge[];
   flows: LiveFlows;
   layout: ReturnType<typeof resolveModel>["layout"];
   hoverId: string | null;
@@ -560,34 +557,7 @@ function Scene({
       <directionalLight position={[5, 8, 5]} intensity={1.0} />
       <Suspense fallback={null}>
         <IslandModel src={src} onIsland={setIslandMesh} />
-        {/* AAM edges between segment anchors */}
-        {islandMesh && edges
-          ? edges
-              .filter((e) => e.weight > 0.06 && e.source !== e.target)
-              .map((e) => {
-                const a = layout[e.source]?.pos;
-                const b = layout[e.target]?.pos;
-                if (!a || !b) return null;
-                const points = [
-                  new THREE.Vector3(a[0], (a[1] ?? 0) + 0.04, a[2]),
-                  new THREE.Vector3(b[0], (b[1] ?? 0) + 0.04, b[2]),
-                ];
-                const geo = new THREE.BufferGeometry().setFromPoints(points);
-                const mat = new THREE.LineBasicMaterial({
-                  color: "#a78bfa",
-                  transparent: true,
-                  opacity: Math.min(1, 0.25 + e.weight * 1.8),
-                  depthWrite: false,
-                });
-                const lineObj = new THREE.Line(geo, mat);
-                return (
-                  <primitive
-                    key={`${e.source}-${e.target}`}
-                    object={lineObj}
-                  />
-                );
-              })
-          : null}
+        {/* Shader overlay disabled — bubbles carry the highlight */}
         {islandMesh && stations.map((s) => {
           const seg = layout[s.id];
           if (!seg) return null;
@@ -614,7 +584,7 @@ function Scene({
   );
 }
 
-export function Island3D({ stations, edges, flows, modelId, className }: Props) {
+export function Island3D({ stations, flows, modelId, className }: Props) {
   const model = useMemo(() => resolveModel(modelId), [modelId]);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
@@ -638,7 +608,6 @@ export function Island3D({ stations, edges, flows, modelId, className }: Props) 
         <Scene
           src={model.src}
           stations={stations}
-          edges={edges}
           flows={flows}
           layout={model.layout}
           hoverId={hoverId}
