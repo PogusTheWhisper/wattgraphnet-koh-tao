@@ -344,7 +344,7 @@ function SegmentDecal({
         />
       </mesh>
 
-      {/* Persistent label badge above bubble */}
+      {/* Compact always-on chip — full info on hover */}
       <Html
         position={labelPos}
         center
@@ -353,24 +353,36 @@ function SegmentDecal({
       >
         <div
           style={{
-            padding: "3px 7px",
-            borderRadius: 4,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "2px 6px",
+            borderRadius: 999,
             background: "rgba(12, 20, 38, 0.92)",
             border: `1px solid ${color}88`,
             color: "#fff",
             fontSize: 9,
             fontWeight: 700,
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
             fontFamily:
               "var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontVariantNumeric: "tabular-nums",
             whiteSpace: "nowrap",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.55)",
             transform: "translate(-50%, -50%)",
+            opacity: isHover ? 0 : 1,
+            transition: "opacity 0.15s",
           }}
         >
-          <span style={{ color }}>● </span>
-          {label} · {(kw / 1000).toFixed(1)} MW
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: color,
+              boxShadow: `0 0 6px ${color}`,
+            }}
+          />
+          {(kw / 1000).toFixed(1)} MW
         </div>
       </Html>
 
